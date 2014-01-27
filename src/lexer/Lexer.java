@@ -57,10 +57,12 @@ public class Lexer {
 	 */
 	boolean readch(char c) throws IOException {
 		readch();
-		if (peek != c)
+		if (peek != c) {
 			return false;
-		peek = ' ';
-		return true;
+		} else {
+			peek = ' ';
+			return true;
+		}
 	}
 
 	/**
