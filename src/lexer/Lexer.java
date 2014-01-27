@@ -2,12 +2,10 @@ package lexer;
 
 import java.io.*;
 import java.util.*;
-import javax.sound.sampled.AudioFileFormat.Type;
-
 import symbols.*;
 
 /**
- * @author matthew
+ * @author Robert Partch and Matthew Romasco
  * 
  */
 public class Lexer {
@@ -81,7 +79,7 @@ public class Lexer {
 			else
 				break;
 		}
-		
+
 		// Recognize composite tokens (e.g. <=)
 		switch (peek) {
 		case '&':
@@ -153,7 +151,8 @@ public class Lexer {
 			Word w = (Word) words.get(s);
 			if (w != null) { // If lexeme is in symbol table
 				return w;
-			} else { // Lexeme must be an identifier
+			} else { // Lexeme must be an identifier and should be added to the
+						// symbol table
 				w = new Word(s, Tag.ID);
 				words.put(s, w);
 				return w;
