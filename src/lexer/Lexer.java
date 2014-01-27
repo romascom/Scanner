@@ -24,10 +24,10 @@ public class Lexer {
 	 */
 	public Lexer() {
 		reserve(new Word("if", Tag.IF));
-		reserve(new Word("else", Tag.ELSE));
+		//reserve(new Word("else", Tag.ELSE));
 		reserve(new Word("while", Tag.WHILE));
-		reserve(new Word("do", Tag.DO));
-		reserve(new Word("break", Tag.BREAK));
+		//reserve(new Word("do", Tag.DO));
+		//reserve(new Word("break", Tag.BREAK));
 		reserve(Word.True);
 		reserve(Word.False);
 		reserve(Type.Int);
@@ -81,10 +81,12 @@ public class Lexer {
 			else
 				break;
 		}
+		
+		// TODO Skip comments (e.g. // and /**/)
 
 		// Recognize composite tokens (e.g. <=)
 		switch (peek) {
-		case '&':
+		/*case '&':
 			if (readch('&'))
 				return Word.and;
 			else
@@ -93,7 +95,7 @@ public class Lexer {
 			if (readch('|'))
 				return Word.or;
 			else
-				return new Token('|');
+				return new Token('|');*/
 		case '=':
 			if (readch('='))
 				return Word.eq;
@@ -139,6 +141,8 @@ public class Lexer {
 				return new Real(x);
 			}
 		}
+		
+		// TODO: Add check for "strings"
 
 		// Collect word
 		if (Character.isLetter(peek)) {

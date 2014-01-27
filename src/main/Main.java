@@ -12,6 +12,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		String filename = args[0];
+		//String outputFilename = "stutest.out";
 		Lexer lex = new Lexer();
 		Token eof = new Token(-1);
 
@@ -23,6 +24,7 @@ public class Main {
 
 			while (!lex.scan().equals(eof)) {
 				// TODO: Print out tokens
+				// TODO: Store tokens in data structure
 			}
 
 		} catch (FileNotFoundException e) {

@@ -16,10 +16,13 @@ public class Word extends Token {
 		return lexeme;
 	}
 
-	public static final Word and = new Word("&&", Tag.AND), or = new Word("||",
-			Tag.OR), eq = new Word("==", Tag.EQ), ne = new Word("!=", Tag.NE),
+	public static final Word lsb = new Word("[", Tag.LSB), RSB = new Word("]", Tag.RSB), = new Word("", Tag.), = new Word("", Tag.),  and = new Word("and", Tag.AND), or = new Word(
+			"or", Tag.OR), not = new Word("not", Tag.NOT), sin = new Word(
+			"sin", Tag.SIN), cos = new Word("cos", Tag.COS), tan = new Word(
+			"tan", Tag.TAN), stdout = new Word("stdout", Tag.STDOUT),
+			eq = new Word("==", Tag.EQ), ne = new Word("!=", Tag.NE),
 			le = new Word("<=", Tag.LE), ge = new Word(">=", Tag.GE),
-			minus = new Word("minus", Tag.MINUS), True = new Word("true",
-					Tag.TRUE), False = new Word("false", Tag.FALSE),
-			temp = new Word("t", Tag.TEMP);
+			minus = new Word("-", Tag.MINUS), True = new Word("true",
+					Tag.TRUE), False = new Word("false", Tag.FALSE);
+
 }
