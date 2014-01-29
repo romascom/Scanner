@@ -13,7 +13,7 @@ public class Lexer {
 	char peek = ' ';
 
 	// Create a string table to map lexemes to tokens
-	Hashtable words = new Hashtable();
+	Hashtable<String, Word> words = new Hashtable<String, Word>();
 
 	void reserve(Word w) {
 		words.put(w.lexeme, w);
@@ -28,8 +28,17 @@ public class Lexer {
 		reserve(new Word("while", Tag.WHILE));
 		//reserve(new Word("do", Tag.DO));
 		//reserve(new Word("break", Tag.BREAK));
+		reserve(Word.or);
+		reserve(Word.and);
+		reserve(Word.let);
+		reserve(Word.not);
+		reserve(Word.sin);
+		reserve(Word.cos);
+		reserve(Word.tan);
 		reserve(Word.True);
 		reserve(Word.False);
+		reserve(Word.stdout);
+		reserve(Word.let);
 		reserve(Type.Int);
 		reserve(Type.Char);
 		reserve(Type.Bool);
