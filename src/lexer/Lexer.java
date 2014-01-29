@@ -24,10 +24,10 @@ public class Lexer {
 	 */
 	public Lexer() {
 		reserve(new Word("if", Tag.IF));
-		//reserve(new Word("else", Tag.ELSE));
+		// reserve(new Word("else", Tag.ELSE));
 		reserve(new Word("while", Tag.WHILE));
-		//reserve(new Word("do", Tag.DO));
-		//reserve(new Word("break", Tag.BREAK));
+		// reserve(new Word("do", Tag.DO));
+		// reserve(new Word("break", Tag.BREAK));
 		reserve(Word.or);
 		reserve(Word.and);
 		reserve(Word.let);
@@ -81,30 +81,37 @@ public class Lexer {
 	 * @throws IOException
 	 */
 	public Token scan() throws IOException {
-		// Skip white space
+		// Skip white space and comments
 		for (;; readch()) {
-			if (peek == ' ' || peek == '\t')
+			if (peek == ' ' || peek == '\t') {
 				continue;
-			else if (peek == '\n')
-				line = line + 1;
-			else
+			} else if (peek == '\n') {
+				line = line + 1; // continue?
+			} else if (peek == '/') {
+				readch();
+				switch (peek) {
+				case '/':
+					while (!readch('\n')) {
+
+					}
+				case '*':
+					char prevch = ' ';
+					while (prevch != '*' && !readch('/')) {
+						prevch = peek;
+					}
+				}
+			} else {
 				break;
+			}
 		}
-		
-		// TODO Skip comments (e.g. // and /**/)
 
 		// Recognize composite tokens (e.g. <=)
 		switch (peek) {
-		/*case '&':
-			if (readch('&'))
-				return Word.and;
-			else
-				return new Token('&');
-		case '|':
-			if (readch('|'))
-				return Word.or;
-			else
-				return new Token('|');*/
+		/*
+		 * case '&': if (readch('&')) return Word.and; else return new
+		 * Token('&'); case '|': if (readch('|')) return Word.or; else return
+		 * new Token('|');
+		 */
 		case '=':
 			if (readch('='))
 				return Word.eq;
@@ -150,7 +157,7 @@ public class Lexer {
 				return new Real(x);
 			}
 		}
-		
+
 		// TODO: Add check for "strings"
 
 		// Collect word
