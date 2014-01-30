@@ -10,6 +10,7 @@ import symbols.*;
  */
 public class Lexer {
 	public static int line = 1;
+	int val = 0;
 	char peek = ' ';
 
 	// Create a string table to map lexemes to tokens
@@ -51,7 +52,9 @@ public class Lexer {
 	 * @throws IOException
 	 */
 	void readch() throws IOException {
-		peek = (char) System.in.read();
+		//peek = (char) System.in.read();
+		val = System.in.read();
+		peek = (char) val;
 	}
 
 	/**
@@ -81,12 +84,15 @@ public class Lexer {
 	 * @throws IOException
 	 */
 	public Token scan() throws IOException {
+		if (val == -1) {
+			return Word.eof;
+		}
 		// Skip white space and comments
 		for (;; readch()) {
 			if (peek == ' ' || peek == '\t') {
 				continue;
 			} else if (peek == '\n') {
-				line = line + 1; // continue?
+				line = line + 1;
 			} else if (peek == '/') {
 				readch();
 				switch (peek) {
@@ -99,10 +105,31 @@ public class Lexer {
 					while (prevch != '*' && !readch('/')) {
 						prevch = peek;
 					}
+				default:
+					return Word.div;
 				}
 			} else {
 				break;
 			}
+		}
+		
+		// 
+		switch (peek) {
+		case '+':
+			readch();
+			return Word.plus;
+		case '-':
+			readch();
+			return Word.minus;
+		case '*':
+			readch();
+			return Word.mult;
+		case '%':
+			readch();
+			return Word.mod;
+		case '^':
+			readch();
+			return Word.pow;
 		}
 
 		// Recognize composite tokens (e.g. <=)
@@ -112,26 +139,38 @@ public class Lexer {
 		 * Token('&'); case '|': if (readch('|')) return Word.or; else return
 		 * new Token('|');
 		 */
+		case ':':
+			if (readch('=')) {
+				return Word.assign;
+			} else {
+				System.err.println("Invalid lexeme");
+			}
 		case '=':
-			if (readch('='))
+			if (readch('=')) {
 				return Word.eq;
-			else
-				return new Token('=');
+			} else {
+				System.err.println("Invalid lexeme");
+			}
+			/*else
+				return Word.eq;//new Token('=', Tag.EQ);*/
 		case '!':
 			if (readch('='))
 				return Word.ne;
-			else
-				return new Token('!');
+			else {
+				System.err.println("Invalid lexeme");
+			}
 		case '<':
-			if (readch('='))
+			if (readch('=')) {
 				return Word.le;
-			else
-				return new Token('<');
+			} else {
+				return Word.lt;
+				//return Word.//new Token('<');
+			}
 		case '>':
 			if (readch('='))
 				return Word.ge;
 			else
-				return new Token('>');
+				return Word.gt; //new Token('>');
 		}
 
 		// Recognize numbers (e.g. 365 and 3.14)
@@ -156,6 +195,7 @@ public class Lexer {
 				}
 				return new Real(x);
 			}
+			
 		}
 
 		// TODO: Add check for "strings"
@@ -180,10 +220,16 @@ public class Lexer {
 				return w;
 			}
 		}
-
+		
+		
+		
+		// Invalid lexeme
+		//System.err.println("Invalid lexeme");
+		return null;
+		
 		// Return any remaining characters as tokens
-		Token tok = new Token(peek);
+		/*Token tok = new Token(peek);
 		peek = ' ';
-		return tok;
+		return tok;*/
 	}
 }

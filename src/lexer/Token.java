@@ -2,8 +2,10 @@ package lexer;
 
 public class Token {
 	public final int tag;
+	public final String lexeme;
 
-	public Token(int t) {
+	public Token(String s, int t) {
+		lexeme = s;
 		tag = t;
 	}
 
