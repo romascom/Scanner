@@ -54,7 +54,9 @@ public class Lexer {
 	void readch() throws IOException {
 		//peek = (char) System.in.read();
 		val = System.in.read();
+		//System.err.println("VAL: " + val);
 		peek = (char) val;
+		System.err.println("VAL: " + peek);
 	}
 
 	/**
@@ -222,7 +224,10 @@ public class Lexer {
 		}
 		
 		
-		
+		System.err.println("VAL: " + (int)(char)val + ", PEEK: " + (int)peek);
+		if (val == -1) {
+			return Word.eof;
+		}
 		// Invalid lexeme
 		//System.err.println("Invalid lexeme");
 		return null;
