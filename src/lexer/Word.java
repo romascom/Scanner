@@ -9,7 +9,7 @@ public class Word extends Token {
 
 	public Word(String s, int tag) {
 		super(s, tag);
-		// lexeme = s;
+		lexeme = s;
 	}
 
 	public String toString() {
@@ -32,7 +32,8 @@ public class Word extends Token {
 					Tag.BASIC), string = new Word("string", Tag.BASIC),
 			lt = new Word("<", Tag.LT), gt = new Word(">", Tag.GT),
 			eq = new Word("==", Tag.EQ), ne = new Word("!=", Tag.NE),
-			le = new Word("<=", Tag.LE), ge = new Word(">=", Tag.GE), eof = new Word("-1", Tag.EOF);/*
+			le = new Word("<=", Tag.LE), ge = new Word(">=", Tag.GE),
+			eof = new Word("-1", Tag.EOF);/*
 										 * , minus = new Word("-", Tag .MINUS)
 										 */// TODO:
 											// Differentiate

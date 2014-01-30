@@ -18,6 +18,7 @@ public class Lexer {
 
 	void reserve(Word w) {
 		words.put(w.lexeme, w);
+		//System.err.println("Key: " + w.lexeme);//debug
 	}
 
 	/*
@@ -56,7 +57,7 @@ public class Lexer {
 		val = System.in.read();
 		//System.err.println("VAL: " + val);
 		peek = (char) val;
-		System.err.println("VAL: " + peek);
+		//System.err.println("VAL: " + peek);
 	}
 
 	/**
@@ -102,11 +103,14 @@ public class Lexer {
 					while (!readch('\n')) {
 
 					}
+					break;
 				case '*':
 					char prevch = ' ';
 					while (prevch != '*' && !readch('/')) {
 						prevch = peek;
 					}
+					readch();
+					break;
 				default:
 					return Word.div;
 				}
@@ -132,6 +136,12 @@ public class Lexer {
 		case '^':
 			readch();
 			return Word.pow;
+		case '[':
+			readch();
+			return Word.lsb;
+		case ']':
+			readch();
+			return Word.rsb;
 		}
 
 		// Recognize composite tokens (e.g. <=)
@@ -200,18 +210,35 @@ public class Lexer {
 			
 		}
 
-		// TODO: Add check for "strings"
-
+		// Check for "strings"
+		// Assumes there is always a matching double quote
+		if (peek == '"') {
+			String buf = "";
+			readch();
+			while (peek != '"') {
+				if (val == -1) return null;
+				buf += peek;
+				readch();
+			}
+			readch();
+			/*do {
+				readch();
+			} while (peek != '"');
+			readch();*/
+			return new Token(buf, Tag.STRING);
+		}
+		
 		// Collect word
-		if (Character.isLetter(peek)) {
+		if (Character.isLetter(peek) || (peek == '_')) {
 			// Get string representation of next lexeme
 			StringBuffer b = new StringBuffer();
 			do {
 				b.append(peek);
 				readch();
-			} while (Character.isLetterOrDigit(peek));
+			} while (Character.isLetterOrDigit(peek) || (peek == '_'));
 			String s = b.toString();
-
+			
+			//System.err.println("Lexeme: " + s);//debug
 			Word w = (Word) words.get(s);
 			if (w != null) { // If lexeme is in symbol table
 				return w;
@@ -224,7 +251,7 @@ public class Lexer {
 		}
 		
 		
-		System.err.println("VAL: " + (int)(char)val + ", PEEK: " + (int)peek);
+		//System.err.println("VAL: " + (int)(char)val + ", PEEK: " + (int)peek);
 		if (val == -1) {
 			return Word.eof;
 		}
