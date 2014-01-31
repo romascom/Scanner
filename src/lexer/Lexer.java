@@ -107,6 +107,7 @@ public class Lexer {
 				case '*':
 					char prevch = ' ';
 					while (prevch != '*' && !readch('/')) {
+						if (val == -1) return Word.eof;
 						prevch = peek;
 					}
 					readch();

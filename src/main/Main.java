@@ -47,7 +47,7 @@ public class Main {
 					System.err.println("Reached EOF");
 					break;
 				}
-				System.out.println("Tag: " + tok.tag + " Lexeme: " + tok.lexeme); // TODO:
+				System.out.println("<" + tok.tag + ", " + tok.lexeme + ">"); // TODO:
 																				// Print
 																				// out
 																				// tokens
