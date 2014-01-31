@@ -56,7 +56,7 @@ CLASSES = \
 # MAIN is a variable with the name of the file containing the main method
 #
 
-MAIN = Main 
+MAIN = main/Main 
 
 #
 # the default make target entry
@@ -75,6 +75,10 @@ default: classes
 
 classes: $(CLASSES:.java=.class)
 
+
+# Generate .jar file
+jar:
+	jar cf test.jar main/Main.class lexer/*.class symbols/Type.class
 
 # Next two lines contain a target for running the program
 # Remember the tab in the second line.
