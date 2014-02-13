@@ -84,8 +84,9 @@ jar:
 # Remember the tab in the second line.
 # $(JMV) y $(MAIN) are replaced by their values
 
-run: $(MAIN).class
-	$(JVM) $(MAIN)
+run:#$(MAIN).class
+	java -cp test.jar $(MAIN) stutest.in # specify the file you want scanned
+#	$(JVM) cp test.jar $(MAIN) # specify the file you want scanned
 
 # this line is to remove all unneeded files from
 # the directory when we are finished executing(saves space)

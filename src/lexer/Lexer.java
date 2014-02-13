@@ -184,8 +184,8 @@ public class Lexer {
 				return Word.ge;
 			else
 				return Word.gt; //new Token('>');
-		}
-
+		} 
+		// TODO add 3.0e and maybe 3.0e to the fourth
 		// Recognize numbers (e.g. 365 and 3.14)
 		if (Character.isDigit(peek)) {
 			// Get integer part
