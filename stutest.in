@@ -30,3 +30,7 @@ sin and not cos
 validlexeme
 " quote that doesn't end"
 //
+string
+int
+bool
+float

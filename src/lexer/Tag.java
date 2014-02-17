@@ -10,7 +10,7 @@ public class Tag {
 			STRING = 272, TRUE = 273, FALSE = 274, ID = 275, NUM = 276,
 			REAL = 277, STDOUT = 278, IF = 279, WHILE = 280, LET = 281,
 			BASIC = 282, EQ = 283, NE = 284, LE = 285, GE = 286, LT = 287,
-			GT = 288, EOF = 289; // TODO: Add tags for nonterminals
+			GT = 288, EOF = 289, TYPE_BOOL = 290, TYPE_INT = 291, TYPE_FLOAT = 292, TYPE_STRING = 293; // TODO: Add tags for nonterminals
 	// the rest
 
 	/*

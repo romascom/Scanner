@@ -42,7 +42,7 @@ public class Lexer {
 		reserve(Word.stdout);
 		reserve(Word.let);
 		reserve(Type.Int);
-		reserve(Type.Char);
+		reserve(Type.String);
 		reserve(Type.Bool);
 		reserve(Type.Float);
 	}

@@ -10,12 +10,12 @@ public class Type extends Word {
 		width = w;
 	}
 
-	public static final Type Int = new Type("int ", Tag.BASIC, 4),
-			Float = new Type("float", Tag.BASIC, 8), Char = new Type("char",
+	public static final Type Int = new Type("int", Tag.BASIC, 4),
+			Float = new Type("float", Tag.BASIC, 8), String = new Type("string",
 					Tag.BASIC, 1), Bool = new Type("bool", Tag.BASIC, 1);
 
 	public static boolean numeric(Type p) {
-		if (p == Type.Char || p == Type.Int || p == Type.Float)
+		if (p == Type.String || p == Type.Int || p == Type.Float)
 			return true;
 		else
 			return false;
@@ -29,6 +29,6 @@ public class Type extends Word {
 		else if (p1 == Type.Int || p2 == Type.Int)
 			return Type.Int;
 		else
-			return Type.Char;
+			return Type.String;
 	}
 }
