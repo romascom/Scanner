@@ -33,15 +33,5 @@ public class Word extends Token {
 			lt = new Word("<", Tag.LT), gt = new Word(">", Tag.GT),
 			eq = new Word("==", Tag.EQ), ne = new Word("!=", Tag.NE),
 			le = new Word("<=", Tag.LE), ge = new Word(">=", Tag.GE),
-			eof = new Word("-1", Tag.EOF);/*
-										 * , minus = new Word("-", Tag .MINUS)
-										 */// TODO:
-											// Differentiate
-											// between
-											// unary
-											// '-'
-											// and
-											// binary
-											// '-'
-	// = new Word("", Tag.),
+			eof = new Word("-1", Tag.EOF);
 }
