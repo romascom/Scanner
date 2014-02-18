@@ -7,7 +7,8 @@ import inter.*;
 
 public class Parser { // see pg. 982 of the text
 	private Lexer lex; // this parser's lexical analyzer
-	private Token lookahead; // lookahead token
+	private Token lookahead = null; // lookahead token
+	private Token lookaheadTwo = null; // second lookahead
 
 	// Env top = null; // current or top symbol table
 	// int used = 0; // storage used for declarations
@@ -15,16 +16,23 @@ public class Parser { // see pg. 982 of the text
 	public Parser(Lexer l) throws IOException {
 		lex = l;
 		nextToken();
+		Node root = T(); // start building tree
 	}
 
 	/**
-	 * Sets the lookahead token to the next token scanned by the lexer. Consumes
-	 * a token.
+	 * Sets the lookahead tokens to the next two tokens scanned by the lexer.
+	 * Consumes two tokens.
 	 * 
 	 * @throws IOException
 	 */
 	void nextToken() throws IOException {
-		lookahead = lex.scan();
+		if (lookahead == null) {
+			lookahead = lex.scan();
+		} else {
+			lookahead = lookaheadTwo;
+		}
+
+		lookaheadTwo = lex.scan();
 	}
 
 	void error(String s) {
@@ -91,7 +99,7 @@ public class Parser { // see pg. 982 of the text
 	private Node expr() {
 		Node node = new Node();
 
-		if (ParserHelper.isStmt(lookahead)) {
+		if (ParserHelper.isStmt(lookaheadTwo)) {
 			node.addChild(stmts());
 		} else {
 			node.addChild(oper());
@@ -99,20 +107,109 @@ public class Parser { // see pg. 982 of the text
 		return node;
 	}
 
+	private Node oper() {
+		Node node = new Node();
+		if (ParserHelper.isConstant(lookahead)) {
+			node.addChild(constants());
+		} else if (ParserHelper.isName(lookahead)) {
+			node.addChild(name());
+		} else {
+			match(Tag.LSB);
+			node.addChild(Tag.LSB);
+			if (lookahead.tag == Tag.ASSIGN) {
+				match(Tag.ASSIGN);
+				node.addChild(Tag.ASSIGN);
+				node.addChild(oper());
+				node.addChild(oper());
+			} else if (lookahead.tag == Tag.MINUS) {
+				match(Tag.MINUS); node.addChild(Tag.MINUS);
+				if (lookaheadTwo.tag != Tag.RSB){
+					node.addChild(oper());
+				}
+				node.addChild(oper());
+			} else if (ParserHelper.isBinop(lookahead)) {
+				node.addChild(lookahead.tag);
+				match(lookahead.tag);
+				node.addChild(oper());
+				node.addChild(oper());
+			} else if (ParserHelper.isUnop(lookahead)) {
+				node.addChild(lookahead.tag);
+				match(lookahead.tag);
+				node.addChild(oper());
+			}
+			match(Tag.RSB);
+			node.addChild(Tag.RSB);
+		}
+
+		return node;
+	}
+
+	private Node constants() {
+		Node node = new Node();
+		switch (lookahead.tag) {
+		case Tag.NUM:
+			node.addChild(ints());
+		case Tag.REAL:
+			node.addChild(floats());
+		default:
+			node.addChild(strings());
+		}
+		return node;
+	}
+
+	private Node strings() {
+		Node node = new Node();
+		switch (lookahead.tag) {
+		case Tag.TRUE:
+			match(Tag.TRUE);
+			node.addChild(Tag.TRUE);
+		case Tag.FALSE:
+			match(Tag.FALSE);
+			node.addChild(Tag.FALSE);
+		case Tag.STRING:
+			node.addChild(lookahead.lexeme);
+			match(Tag.STRING);
+		default:
+			error("syntax error");
+		}
+		return node;
+	}
+
+	private Node name() {
+		Node node = new Node();
+		node.addChild(lookahead.lexeme);
+		match(Tag.ID);
+		return node;
+	}
+
+	private Node ints() {
+		Node node = new Node();
+		node.addChild(lookahead.lexeme);
+		match(Tag.NUM);
+		return node;
+	}
+
+	private Node floats() {
+		Node node = new Node();
+		node.addChild(lookahead.lexeme);
+		match(Tag.REAL);
+		return node;
+	}
+
 	private Node stmts() {
 		Node node = new Node();
-		switch ( lookahead.tag ) {
-		case Tag.:
-			printstmts();
+		switch (lookahead.tag) {
+		case Tag.STDOUT:
+			node.addChild(printstmts());
 			break;
-		case ifstmts:
-			ifstmts();
+		case Tag.IF:
+			node.addChild(ifstmts());
 			break;
-		case whilestmts:
-			whilestmts();
+		case Tag.WHILE:
+			node.addChild(whilestmts());
 			break;
-		case letstmts:
-			letstmts();
+		case Tag.LET:
+			node.addChild(letstmts());
 			break;
 		default:
 			error("syntax error");
@@ -120,7 +217,7 @@ public class Parser { // see pg. 982 of the text
 		}
 		return node;
 	}
-	
+
 	private Node printstmts() {
 		Node node = new Node();
 		match(Tag.LSB);
