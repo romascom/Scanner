@@ -64,14 +64,19 @@ public class Parser { // see pg. 982 of the text
 	 *            The node's depth (root should be set to 0)
 	 */
 	private void printSymbolTree(Node node, int depth) {
+		System.err.println("depth: " + depth);//debug
 		for (int i = 0; i < 5; i++) { // for each of node's children
+			if (node.getChild(i) == null) {
+				System.err.println("Child " + i + " is null");//debug
+			}
 			if (node.getLexeme() != null) { // if node is a terminal
+				System.err.println("We're going to print a terminal");//debug
 				int d = depth;
 				while (d != 0) { // indent according to appropriate depth
 					System.out.println("  ");
 					d--;
 				}
-				System.out.println(node.getLexeme());
+				 
 
 			}
 			if (node.getChild(i) != null) {
@@ -111,7 +116,7 @@ public class Parser { // see pg. 982 of the text
 	 */
 	void match(int t, Node node) {
 		System.err.println("Tag to match: " + t);// debug
-		if (lookaheadTwo.tag == Tag.EOF) {
+		if (lookahead.tag == Tag.EOF) {
 			return;
 		}
 		if (lookahead.tag == t) {
@@ -132,6 +137,7 @@ public class Parser { // see pg. 982 of the text
 		match(Tag.LSB, root);
 		root.addChild(S());
 		match(Tag.RSB, root);
+		System.err.println(root.getChild(0).getLexeme());//debug
 		return root;
 	}
 

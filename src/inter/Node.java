@@ -40,10 +40,29 @@ public class Node {
 		// TODO handle out of bounds exception
 	}
 	
-	public void addChild(Token t) {
+	public void setTag(int tag) {
+		this.tag = tag;
+	}
+	
+	public void setLexeme(String lexeme) {
+		this.lexeme = lexeme;
+	}
+	
+	public void setChild(Node child, int i) {
+		this.children[i] = child;
+	}
+	
+	public void addChild(Token t) { //TODO maybe I need to pass the node in instead of the token
 		//if(tag == 0) return;
+		System.err.println("t.tag: " + t.tag);
+		System.err.println("t.lexeme: " + t.lexeme);
+		System.err.println("CHILD #" + i);
+		Node child = new Node(t.tag, t.lexeme);
+		this.setChild(child, i);
+		//children[i] = new Node(t.tag, t.lexeme);
 		
-		children[i] = new Node(t.tag, t.lexeme);
+		//children[i].setTag(t.tag);
+		//children[i].setLexeme(t.lexeme);
 		i++;
 		// TODO handle out of bounds exception
 	}
