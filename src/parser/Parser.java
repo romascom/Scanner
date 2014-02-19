@@ -27,17 +27,31 @@ public class Parser { // see pg. 982 of the text
 	 * @throws IOException
 	 */
 	void nextToken() throws IOException {
+		System.err.println("nextToken() was called");// debug
 		if (lookahead == null) {
+			System.err.println("lookahead is null");// debug
 			lookahead = lex.scan();
 		} else {
 			lookahead = lookaheadTwo;
 		}
 
 		lookaheadTwo = lex.scan();
+
+		/*
+		 * System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
+		 * System.err.println("lookahead.tag is " + lookahead.tag);//debug
+		 * System.err.println("\nlookaheadTwo.lexeme is " +
+		 * lookaheadTwo.lexeme);//debug
+		 * System.err.println("\nlookaheadTwo.tag is " +
+		 * lookaheadTwo.tag);//debug
+		 */
 	}
 
 	void error(String s) {
-		throw new Error("near line " + lex.line + ": " + s);
+		System.err.println(s);
+		new Exception().printStackTrace();// debug
+		System.exit(1);
+		// throw new Error("near line " + lex.line + ": " + s);
 	} // TODO: Define lex.line ... or not
 
 	/**
@@ -60,7 +74,9 @@ public class Parser { // see pg. 982 of the text
 				System.out.println(node.getLexeme());
 
 			}
-			printSymbolTree(node.getChild(i), depth++);
+			if (node.getChild(i) != null) {
+				printSymbolTree(node.getChild(i), depth++);
+			}
 		}
 	}
 
@@ -94,16 +110,20 @@ public class Parser { // see pg. 982 of the text
 	 * @throws IOException
 	 */
 	void match(int t, Node node) {
+		System.err.println("Tag to match: " + t);// debug
+		if (lookaheadTwo.tag == Tag.EOF) {
+			return;
+		}
 		if (lookahead.tag == t) {
 			node.addChild(lookahead);
 			try {
 				nextToken();
 			} catch (IOException e) {
-				System.out.println(e.getMessage());
-				System.exit(0);
+				System.err.println(e.getMessage());
+				System.exit(1);
 			}
 		} else {
-			error("syntax error");
+			error("syntax error: " + lookahead.tag + " != " + t);
 		}
 	}
 
@@ -116,6 +136,7 @@ public class Parser { // see pg. 982 of the text
 	}
 
 	private Node S() {
+		System.err.println("lookahead.tag at S(): " + lookahead.tag);// debug
 		Node node = new Node();
 		if (lookahead.tag == Tag.LSB) {
 			match(Tag.LSB, node);

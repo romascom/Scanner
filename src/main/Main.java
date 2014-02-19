@@ -5,17 +5,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import lexer.Lexer;
 //import lexer.Tag;
-import lexer.Token;
-import lexer.Word;
+//import lexer.Token;
+//import lexer.Word;
 import parser.*;
-import java.io.*;
+//import java.io.*;
 
 public class Main {
 	public Main() {
 	}
 
 	public static void main(String[] args) {
-		String filename = args[0];
+		//String filename = args[0];
 		Lexer lex = new Lexer();
 
 		System.out.println("Hello World!");
@@ -23,6 +23,7 @@ public class Main {
 		for (String path: args) {
 			try {
 				// Reassign the standard input stream to be a file
+				System.err.println("The file being opened is " + path);//debug
 				System.setIn(new FileInputStream(path));
 				
 				Parser parser = new Parser(lex);
