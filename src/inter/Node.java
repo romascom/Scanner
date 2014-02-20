@@ -45,10 +45,11 @@ public class Node {
 			System.out.println(this.lexeme);
 		}
 		for (int j = 0; j < this.i; j++) { // for each of node's children
+			int temp = depth;
 			if (this.children[j] == null) {
 				System.err.println("Child " + j + " is null");//debug
 			} else {
-				this.children[j].printSymbolTree(++depth);
+				this.children[j].printSymbolTree(++temp);
 			}
 		}
 	}
