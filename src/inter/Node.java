@@ -24,6 +24,35 @@ public class Node {
 		this.lexeme = lexeme;
 	}
 	
+	/**
+	 * Print a symbol tree, given the tree's root node, indenting according to
+	 * depth.
+	 * 
+	 * @param node
+	 *            The symbol tree's root node
+	 * @param depth
+	 *            The node's depth (root should be set to 0)
+	 */
+	public void printSymbolTree(int depth) {
+		System.err.println("depth: " + depth);//debug
+		if (this.lexeme != null) { // if node is a terminal
+			System.err.println("We're going to print a terminal");//debug
+			int d = depth;
+			while (d != 0) { // indent according to appropriate depth
+				System.out.print("  ");
+				d--;
+			}
+			System.out.println(this.lexeme);
+		}
+		for (int j = 0; j < this.i; j++) { // for each of node's children
+			if (this.children[j] == null) {
+				System.err.println("Child " + j + " is null");//debug
+			} else {
+				this.children[j].printSymbolTree(++depth);
+			}
+		}
+	}
+	
 	public String getLexeme() {
 		return lexeme;
 	}
@@ -58,7 +87,9 @@ public class Node {
 		System.err.println("t.lexeme: " + t.lexeme);
 		System.err.println("CHILD #" + i);
 		Node child = new Node(t.tag, t.lexeme);
-		this.setChild(child, i);
+		//this.setChild(child, i);
+		this.children[i] = child;
+		System.err.println("children[" + i + "].lexeme = " + children[i].lexeme);//debug
 		//children[i] = new Node(t.tag, t.lexeme);
 		
 		//children[i].setTag(t.tag);

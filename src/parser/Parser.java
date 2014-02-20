@@ -17,7 +17,8 @@ public class Parser { // see pg. 982 of the text
 		lex = l;
 		nextToken();
 		Node root = T(); // start building tree
-		printSymbolTree(root, 0);
+		System.err.println("Tree has been created");
+		root.printSymbolTree(0);
 	}
 
 	/**
@@ -137,7 +138,7 @@ public class Parser { // see pg. 982 of the text
 		match(Tag.LSB, root);
 		root.addChild(S());
 		match(Tag.RSB, root);
-		System.err.println(root.getChild(0).getLexeme());//debug
+		//System.err.println(root.getChild(0).getLexeme());//debug
 		return root;
 	}
 
