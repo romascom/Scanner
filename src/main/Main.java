@@ -19,7 +19,7 @@ public class Main {
 		//String filename = args[0];
 		Lexer lex = new Lexer();
 
-		System.out.println("Hello World!");
+		System.out.println("Hello World!");//debug
 		// TODO: Argument checking
 		for (String path: args) {
 			try {

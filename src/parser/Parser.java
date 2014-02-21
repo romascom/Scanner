@@ -65,19 +65,18 @@ public class Parser { // see pg. 982 of the text
 	 *            The node's depth (root should be set to 0)
 	 */
 	private void printSymbolTree(Node node, int depth) {
-		System.err.println("depth: " + depth);//debug
+		System.err.println("depth: " + depth);// debug
 		for (int i = 0; i < 5; i++) { // for each of node's children
 			if (node.getChild(i) == null) {
-				System.err.println("Child " + i + " is null");//debug
+				System.err.println("Child " + i + " is null");// debug
 			}
 			if (node.getLexeme() != null) { // if node is a terminal
-				System.err.println("We're going to print a terminal");//debug
+				System.err.println("We're going to print a terminal");// debug
 				int d = depth;
 				while (d != 0) { // indent according to appropriate depth
 					System.out.println("  ");
 					d--;
 				}
-				 
 
 			}
 			if (node.getChild(i) != null) {
@@ -138,19 +137,22 @@ public class Parser { // see pg. 982 of the text
 		match(Tag.LSB, root);
 		root.addChild(S());
 		match(Tag.RSB, root);
-		//System.err.println(root.getChild(0).getLexeme());//debug
+		// System.err.println(root.getChild(0).getLexeme());//debug
 		return root;
 	}
 
 	private Node S() {
-		System.err.println("lookahead.tag at S(): " + lookahead.tag);// debug
 		Node node = new Node();
 		if (lookahead.tag == Tag.LSB) {
-			match(Tag.LSB, node);
-			if (lookahead.tag != Tag.RSB) {
-				node.addChild(S());
+			if (ParserHelper.isLSBExpr(lookaheadTwo)) {
+				node.addChild(expr());
+			} else {
+				match(Tag.LSB);
+				if (lookahead.tag != Tag.RSB) {
+					node.addChild(S());
+				}
+				match(Tag.RSB);
 			}
-			match(Tag.RSB, node);
 		} else {
 			node.addChild(expr());
 		}
@@ -158,13 +160,11 @@ public class Parser { // see pg. 982 of the text
 		return node;
 	}
 
-	private Node SPrime() {
+	private Node SPrime() { // S' -> ] S
 		Node node = new Node();
-
-		if (lookahead.tag == Tag.RSB) {
-			return null;
+		if (lookahead.tag != Tag.RSB) {
+		node.addChild(S()); node.addChild(SPrime());
 		}
-		node.addChild(S());
 		return node;
 	}
 
@@ -211,15 +211,18 @@ public class Parser { // see pg. 982 of the text
 		return node;
 	}
 
-	private Node constants() {
+	private Node constants() { // constants -> ints | floats | strings
 		Node node = new Node();
 		switch (lookahead.tag) {
 		case Tag.NUM:
 			node.addChild(ints());
+			break;
 		case Tag.REAL:
 			node.addChild(floats());
+			break;
 		default:
 			node.addChild(strings());
+			break;
 		}
 		return node;
 	}
@@ -229,12 +232,16 @@ public class Parser { // see pg. 982 of the text
 		switch (lookahead.tag) {
 		case Tag.TRUE:
 			match(Tag.TRUE, node);
+			break;
 		case Tag.FALSE:
 			match(Tag.FALSE, node);
+			break;
 		case Tag.STRING:
 			match(Tag.STRING, node);
+			break;
 		default:
 			error("syntax error");
+			break;
 		}
 		return node;
 	}
@@ -259,7 +266,7 @@ public class Parser { // see pg. 982 of the text
 
 	private Node stmts() {
 		Node node = new Node();
-		switch (lookahead.tag) {
+		switch (lookaheadTwo.tag) {
 		case Tag.STDOUT:
 			node.addChild(printstmts());
 			break;
@@ -309,6 +316,7 @@ public class Parser { // see pg. 982 of the text
 		node.addChild(expr());
 		node.addChild(exprlist());
 		match(Tag.RSB, node);
+		
 		return node;
 	}
 

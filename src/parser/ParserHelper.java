@@ -63,4 +63,12 @@ public class ParserHelper {
 		}
 	}
 
+	public static boolean isLSBExpr(Token lookahead) {
+		if (isStmt(lookahead) || isUnop(lookahead) || isBinop(lookahead)
+				|| lookahead.tag == Tag.ASSIGN) {
+			return true;
+		}
+		return false;
+
+	}
 }
