@@ -116,11 +116,11 @@ public class Parser { // see pg. 982 of the text
 			if (ParserHelper.isLSBExpr(lookaheadTwo)) {
 				node.addChild(expr());
 			} else {
-				match(Tag.LSB);
+				match(Tag.LSB, node);
 				if (lookahead.tag != Tag.RSB) {
 					node.addChild(S());
 				}
-				match(Tag.RSB);
+				match(Tag.RSB, node);
 			}
 		} else {
 			node.addChild(expr());
@@ -131,7 +131,7 @@ public class Parser { // see pg. 982 of the text
 
 	private Node SPrime() { // S' -> ] S
 		Node node = new Node();
-		if (lookahead.tag != Tag.RSB) {
+		if (lookahead.tag != Tag.RSB && lookahead.tag != Tag.EOF) {
 		node.addChild(S()); node.addChild(SPrime());
 		}
 		return node;

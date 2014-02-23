@@ -36,6 +36,7 @@ public class Main {
 								+ child.getPath());// debug
 						System.setIn(new FileInputStream(child.getPath()));
 
+						lex = new Lexer();
 						Parser parser = new Parser(lex);
 					}
 				}
