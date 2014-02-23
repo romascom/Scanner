@@ -55,36 +55,6 @@ public class Parser { // see pg. 982 of the text
 	} // TODO: Define lex.line ... or not
 
 	/**
-	 * Print a symbol tree, given the tree's root node, indenting according to
-	 * depth.
-	 * 
-	 * @param node
-	 *            The symbol tree's root node
-	 * @param depth
-	 *            The node's depth (root should be set to 0)
-	 */
-	private void printSymbolTree(Node node, int depth) {
-		System.err.println("depth: " + depth);// debug
-		for (int i = 0; i < 5; i++) { // for each of node's children
-			if (node.getChild(i) == null) {
-				System.err.println("Child " + i + " is null");// debug
-			}
-			if (node.getLexeme() != null) { // if node is a terminal
-				System.err.println("We're going to print a terminal");// debug
-				int d = depth;
-				while (d != 0) { // indent according to appropriate depth
-					System.out.println("  ");
-					d--;
-				}
-
-			}
-			if (node.getChild(i) != null) {
-				printSymbolTree(node.getChild(i), depth++);
-			}
-		}
-	}
-
-	/**
 	 * Ensures that t matches the lookahead token before consuming another
 	 * token.
 	 * 
