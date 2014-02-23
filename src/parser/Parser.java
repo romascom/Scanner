@@ -32,25 +32,24 @@ public class Parser { // see pg. 982 of the text
 		if (lookahead == null) {
 			System.err.println("lookahead is null");// debug
 			lookahead = lex.scan();
+			System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
 		} else {
 			lookahead = lookaheadTwo;
 		}
 
 		lookaheadTwo = lex.scan();
 
-		/*
-		 * System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
-		 * System.err.println("lookahead.tag is " + lookahead.tag);//debug
-		 * System.err.println("\nlookaheadTwo.lexeme is " +
-		 * lookaheadTwo.lexeme);//debug
-		 * System.err.println("\nlookaheadTwo.tag is " +
-		 * lookaheadTwo.tag);//debug
-		 */
+		System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
+		System.err.println("lookahead.tag is " + lookahead.tag);//debug
+		System.err.println("\nlookaheadTwo.lexeme is " +
+		lookaheadTwo.lexeme);//debug
+		System.err.println("\nlookaheadTwo.tag is " +
+		lookaheadTwo.tag);//debug
 	}
 
 	void error(String s) {
 		System.err.println(s);
-		new Exception().printStackTrace();// debug
+		//new Exception().printStackTrace();// debug
 		System.exit(1);
 		// throw new Error("near line " + lex.line + ": " + s);
 	} // TODO: Define lex.line ... or not

@@ -92,10 +92,11 @@ public class Lexer {
 		}
 		// Skip white space and comments
 		for (;; readch()) {
-			if (peek == ' ' || peek == '\t') {
+			if (peek == ' ' || peek == '\t' || peek == '\r') {
 				continue;
 			} else if (peek == '\n') {
 				line = line + 1;
+				continue;
 			} else if (peek == '/') {
 				readch();
 				switch (peek) {
@@ -119,6 +120,9 @@ public class Lexer {
 				break;
 			}
 		}
+		
+		//for (int i = 0; i < 4; i++) readch();//debug
+		//System.err.println("peek: " + peek);//debug
 		
 		// 
 		switch (peek) {
@@ -257,7 +261,8 @@ public class Lexer {
 			return Word.eof;
 		}
 		// Invalid lexeme
-		//System.err.println("Invalid lexeme");
+		System.err.println("peek: " + peek);//debug
+		if (peek == '\n') System.err.println("\\n");//debug
 		return null;
 		
 		// Return any remaining characters as tokens
