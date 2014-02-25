@@ -90,7 +90,9 @@ jar:
 # $(JMV) y $(MAIN) are replaced by their values
 
 run:#$(MAIN).class
-	java -cp test.jar $(MAIN) stutest.in # specify the file you want scanned
+	java -cp test.jar $(MAIN) stutest.in > stutest.out # specify the file you want scanned
+	cat stutest.in
+	cat stutest.out
 #	$(JVM) cp test.jar $(MAIN) # specify the file you want scanned
 
 # this line is to remove all unneeded files from
@@ -100,6 +102,6 @@ run:#$(MAIN).class
 #
 
 clean:
-	rm -rf ./bin
-#	$(RM) -r main/*.class lexer/*.class symbols/*.class
+#	rm -rf ./bin
+	rm -rf main lexer inter parser symbols
 
