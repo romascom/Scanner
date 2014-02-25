@@ -10,6 +10,11 @@ public class Real extends Token {
 		super(Float.toString(v), Tag.REAL);
 		//value = v;
 	}
+	
+	public Real(String v) {
+		super(v, Tag.REAL);
+		//value = v;
+	}
 
 	/*public String toString() {
 		return "" + value;

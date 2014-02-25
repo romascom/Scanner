@@ -18,7 +18,7 @@ public class Lexer {
 
 	void reserve(Word w) {
 		words.put(w.lexeme, w);
-		//System.err.println("Key: " + w.lexeme);//debug
+		// System.err.println("Key: " + w.lexeme);//debug
 	}
 
 	/*
@@ -53,11 +53,11 @@ public class Lexer {
 	 * @throws IOException
 	 */
 	void readch() throws IOException {
-		//peek = (char) System.in.read();
+		// peek = (char) System.in.read();
 		val = System.in.read();
-		//System.err.println("VAL: " + val);
+		// System.err.println("VAL: " + val);
 		peek = (char) val;
-		//System.err.println("VAL: " + peek);
+		// System.err.println("VAL: " + peek);
 	}
 
 	/**
@@ -108,7 +108,8 @@ public class Lexer {
 				case '*':
 					char prevch = ' ';
 					while (prevch != '*' && !readch('/')) {
-						if (val == -1) return Word.eof;
+						if (val == -1)
+							return Word.eof;
 						prevch = peek;
 					}
 					readch();
@@ -120,11 +121,11 @@ public class Lexer {
 				break;
 			}
 		}
-		
-		//for (int i = 0; i < 4; i++) readch();//debug
-		//System.err.println("peek: " + peek);//debug
-		
-		// 
+
+		// for (int i = 0; i < 4; i++) readch();//debug
+		// System.err.println("peek: " + peek);//debug
+
+		//
 		switch (peek) {
 		case '+':
 			readch();
@@ -168,8 +169,9 @@ public class Lexer {
 			} else {
 				System.err.println("Invalid lexeme");
 			}
-			/*else
-				return Word.eq;//new Token('=', Tag.EQ);*/
+			/*
+			 * else return Word.eq;//new Token('=', Tag.EQ);
+			 */
 		case '!':
 			if (readch('='))
 				return Word.ne;
@@ -181,14 +183,14 @@ public class Lexer {
 				return Word.le;
 			} else {
 				return Word.lt;
-				//return Word.//new Token('<');
+				// return Word.//new Token('<');
 			}
 		case '>':
 			if (readch('='))
 				return Word.ge;
 			else
-				return Word.gt; //new Token('>');
-		} 
+				return Word.gt; // new Token('>');
+		}
 		// TODO add 3.0e and maybe 3.0e to the fourth
 		// Recognize numbers (e.g. 365 and 3.14)
 		if (Character.isDigit(peek)) {
@@ -198,21 +200,42 @@ public class Lexer {
 				v = 10 * v + Character.digit(peek, 10);
 				readch();
 			} while (Character.isDigit(peek));
-			if (peek != '.') { // If an integer
+			if (peek != '.' && peek != 'e' && peek != 'E') { // If an integer
 				return new Num(v);
 			} else { // Get fraction part
 				float x = v;
 				float d = 10;
-				for (;;) {
+				if (peek == '.') {
+					for (;;) {
+						readch();
+						if (!Character.isDigit(peek)) {
+							break;
+						}
+						x = x + Character.digit(peek, 10) / d;
+						d = d * 10;
+					}
+				}
+				if (peek == 'e' || peek == 'E') { // check for exponent
+					String exponent = "" + peek;
 					readch();
-					if (!Character.isDigit(peek))
-						break;
-					x = x + Character.digit(peek, 10) / d;
-					d = d * 10;
+					if (peek == '-') {
+						exponent += peek;
+						readch();
+					}
+					int ex = 0;
+					int m = 1;
+					while (Character.isDigit(peek)) {
+						ex = ex + Character.digit(peek, 10) * m;
+						m = m * 10;
+						readch();
+					}
+					exponent += ex;
+					
+					return new Real(x + exponent);
 				}
 				return new Real(x);
 			}
-			
+
 		}
 
 		// Check for "strings"
@@ -221,18 +244,18 @@ public class Lexer {
 			String buf = "";
 			readch();
 			while (peek != '"') {
-				if (val == -1) return null;
+				if (val == -1)
+					return null;
 				buf += peek;
 				readch();
 			}
 			readch();
-			/*do {
-				readch();
-			} while (peek != '"');
-			readch();*/
+			/*
+			 * do { readch(); } while (peek != '"'); readch();
+			 */
 			return new Token(buf, Tag.STRING);
 		}
-		
+
 		// Collect word
 		if (Character.isLetter(peek) || (peek == '_')) {
 			// Get string representation of next lexeme
@@ -242,8 +265,8 @@ public class Lexer {
 				readch();
 			} while (Character.isLetterOrDigit(peek) || (peek == '_'));
 			String s = b.toString();
-			
-			//System.err.println("Lexeme: " + s);//debug
+
+			// System.err.println("Lexeme: " + s);//debug
 			Word w = (Word) words.get(s);
 			if (w != null) { // If lexeme is in symbol table
 				return w;
@@ -254,20 +277,21 @@ public class Lexer {
 				return w;
 			}
 		}
-		
-		
-		//System.err.println("VAL: " + (int)(char)val + ", PEEK: " + (int)peek);
+
+		// System.err.println("VAL: " + (int)(char)val + ", PEEK: " +
+		// (int)peek);
 		if (val == -1) {
 			return Word.eof;
 		}
 		// Invalid lexeme
-		System.err.println("peek: " + peek);//debug
-		if (peek == '\n') System.err.println("\\n");//debug
+		System.err.println("peek: " + peek);// debug
+		if (peek == '\n')
+			System.err.println("\\n");// debug
 		return null;
-		
+
 		// Return any remaining characters as tokens
-		/*Token tok = new Token(peek);
-		peek = ' ';
-		return tok;*/
+		/*
+		 * Token tok = new Token(peek); peek = ' '; return tok;
+		 */
 	}
 }

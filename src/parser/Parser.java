@@ -49,7 +49,7 @@ public class Parser { // see pg. 982 of the text
 
 	void error(String s) {
 		System.err.println(s);
-		//new Exception().printStackTrace();// debug
+		new Exception().printStackTrace();// debug
 		System.exit(1);
 		// throw new Error("near line " + lex.line + ": " + s);
 	} // TODO: Define lex.line ... or not
