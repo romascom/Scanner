@@ -193,26 +193,37 @@ public class Lexer {
 		}
 		// TODO add 3.0e and maybe 3.0e to the fourth
 		// Recognize numbers (e.g. 365 and 3.14)
-		if (Character.isDigit(peek)) {
+		if (Character.isDigit(peek) || peek == '.') {
+
 			// Get integer part
-			int v = 0;
-			do {
-				v = 10 * v + Character.digit(peek, 10);
+			//int v = 0;
+			String v = "";
+			/*if (Character.isDigit(peek)) {
+				do {
+					v = 10 * v + Character.digit(peek, 10);
+					readch();
+				} while (Character.isDigit(peek));
+			}*/
+			while (Character.isDigit(peek)) {
+				v += peek;
+				//v = 10 * v + Character.digit(peek, 10);
 				readch();
-			} while (Character.isDigit(peek));
+			}
 			if (peek != '.' && peek != 'e' && peek != 'E') { // If an integer
 				return new Num(v);
 			} else { // Get fraction part
-				float x = v;
-				float d = 10;
+				String x = v;
+				//float d = 10;
 				if (peek == '.') {
+					x += peek;
 					for (;;) {
 						readch();
 						if (!Character.isDigit(peek)) {
 							break;
 						}
-						x = x + Character.digit(peek, 10) / d;
-						d = d * 10;
+						x += peek;
+						//x = x + Character.digit(peek, 10) / d;
+						//d = d * 10;
 					}
 				}
 				if (peek == 'e' || peek == 'E') { // check for exponent
@@ -222,18 +233,19 @@ public class Lexer {
 						exponent += peek;
 						readch();
 					}
-					int ex = 0;
-					int m = 1;
+					//int ex = 0;
+					//int m = 1;
 					while (Character.isDigit(peek)) {
-						ex = ex + Character.digit(peek, 10) * m;
-						m = m * 10;
+						exponent += peek;
+						//ex = ex + Character.digit(peek, 10) * m;
+						//m = m * 10;
 						readch();
 					}
-					exponent += ex;
-					
-					return new Real(x + exponent);
+					//exponent += ex;
+
+					return new Real(x + exponent); // with exponent
 				}
-				return new Real(x);
+				return new Real(x); // no exponent
 			}
 
 		}
