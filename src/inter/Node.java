@@ -6,6 +6,7 @@ public class Node {
 	private Node[] children = new Node[6];
 	private int tag = 0;
 	private String lexeme = null;
+	private Token tok;
 	private int i = 0;
 	
 	public Node() {
@@ -14,6 +15,10 @@ public class Node {
 	public Node(int tag, String lexeme) {
 		this.tag = tag;
 		this.lexeme = lexeme;
+	}
+	
+	public Node(Token tok) {
+		this.tok = tok;
 	}
 	
 	/**
@@ -59,7 +64,10 @@ public class Node {
 		System.err.println("	t.tag: " + t.tag);
 		System.err.println("	t.lexeme: " + t.lexeme);
 		System.err.println("CHILD #" + i);
-		Node child = new Node(t.tag, t.lexeme);
+		Node child = new Node(t);
+		child.tag = t.tag; // TODO remove this, eventually
+		child.lexeme = t.lexeme;
+		//Node child = new Node(t.tag, t.lexeme);
 		this.children[i] = child;
 		System.err.println("children[" + i + "].lexeme = " + children[i].lexeme);//debug
 		i++;

@@ -93,7 +93,7 @@ public class Parser { // see pg. 982 of the text
 	private Node S() {
 		Node node = new Node();
 		if (lookahead.tag == Tag.LSB) {
-			if (ParserHelper.isLSBExpr(lookaheadTwo)) {
+			if (lookaheadTwo.isLSBExpr()) {
 				node.addChild(expr());
 			} else {
 				match(Tag.LSB, node);
@@ -120,7 +120,7 @@ public class Parser { // see pg. 982 of the text
 	private Node expr() {
 		Node node = new Node();
 
-		if (ParserHelper.isStmt(lookaheadTwo)) {
+		if (lookaheadTwo.isStmt()) {
 			node.addChild(stmts());
 		} else {
 			node.addChild(oper());
@@ -130,9 +130,9 @@ public class Parser { // see pg. 982 of the text
 
 	private Node oper() {
 		Node node = new Node();
-		if (ParserHelper.isConstant(lookahead)) {
+		if (lookahead.isConstant()) {
 			node.addChild(constants());
-		} else if (ParserHelper.isName(lookahead)) {
+		} else if (lookahead.isName()) {
 			node.addChild(name());
 		} else {
 			match(Tag.LSB, node);
@@ -146,11 +146,11 @@ public class Parser { // see pg. 982 of the text
 					node.addChild(oper());
 				}
 				node.addChild(oper());
-			} else if (ParserHelper.isBinop(lookahead)) {
+			} else if (lookahead.isBinop()) {
 				match(lookahead.tag, node);
 				node.addChild(oper());
 				node.addChild(oper());
-			} else if (ParserHelper.isUnop(lookahead)) {
+			} else if (lookahead.isUnop()) {
 				match(lookahead.tag, node);
 				node.addChild(oper());
 			}
