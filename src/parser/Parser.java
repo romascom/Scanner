@@ -55,26 +55,6 @@ public class Parser { // see pg. 982 of the text
 	} // TODO: Define lex.line ... or not
 
 	/**
-	 * Ensures that t matches the lookahead token before consuming another
-	 * token.
-	 * 
-	 * @param t
-	 * @throws IOException
-	 */
-	void match(int t) {
-		if (lookahead.tag == t) {
-			try {
-				nextToken();
-			} catch (IOException e) {
-				System.err.println(e.getMessage());
-				System.exit(1);
-			}
-		} else {
-			error("syntax error");
-		}
-	}
-
-	/**
 	 * If the supplied tag matches the first lookahead, consume the first
 	 * lookahead and add it to supplied node's list of children.
 	 * 

@@ -2,7 +2,7 @@ package parser;
 
 import lexer.*;
 
-public class ParserHelper {
+public class ParserHelper { // TODO Move ParserHelper's contents to Token
 
 	public static boolean isString(Token lookahead) {
 		if (lookahead.tag == Tag.TRUE || lookahead.tag == Tag.FALSE
