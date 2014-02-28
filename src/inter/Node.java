@@ -8,6 +8,7 @@ public class Node {
 	private String lexeme = null;
 	private Token tok;
 	private int i = 0;
+	private boolean floatConversion = false; // flag for determining whether a given number must be converted to a float
 
 	public Node() {
 	}
@@ -80,63 +81,167 @@ public class Node {
 		i++;
 	}
 
-	public static Node traverse(Node parent) {
-		System.err.println("parent.lexeme: " + parent.lexeme);//debug
+	public static Node traverse(Node parent, boolean print) {
+		boolean willPrint = print;
+		//System.err.println("parent.lexeme: " + parent.lexeme);// debug
 		boolean unaryMinus = false;
+		boolean floatFlag = false;
 		for (int i = 0; i < 6; i++) { // Run through all children
 			Node oper1;
 			Node oper2;
 			Node child = parent.children[i];
-			
+
 			if (child == null) {
 				break;
 			}
-			System.err.println("child.lexeme: " + child.lexeme);//debug
+			//System.err.println("child.lexeme: " + child.lexeme);// debug
+			//System.err.println("  child.tag: " + child.tag);// debug
 			if (child.lexeme != null) {
 				if (child.getTag() == Tag.MINUS) {
-					if (parent.children[i + 2].lexeme == null) { // && lexeme != Tag.RSB
+					if (parent.children[i + 2].lexeme == null) { // && lexeme !=
+																	// Tag.RSB
 						// is binary
 					} else {
 						// it’s unary
+						//System.err.println("unaryMinus has been set to true");// debug
 						unaryMinus = true;
 					}
-				} if (unaryMinus && child.tok.isUnop()) {
-					oper1 = traverse(parent.children[++i]);
+				}
+				if (unaryMinus && child.tok.isUnop()) {
+					oper1 = traverse(parent.children[++i], true);
 					if (oper1.tag == Tag.REAL) {
+						floatFlag = true;
 						System.out.print("f");
 					}
 
 					System.out.print(child.lexeme + " ");
 				} else if (child.tok.isBinop()) {
-					System.out.println("  This child is a binary operator");//debug
-					oper1 = traverse(parent.children[++i]);
-					oper2 = traverse(parent.children[++i]);
+					//System.out.println("  This child is a binary operator");// debug
+					oper1 = traverse(parent.children[++i], false);
 
-					System.out.print(oper1.lexeme + " ");
-					if ((oper1.tag != Tag.REAL) && (oper2.tag == Tag.REAL)) {
+					if (oper1.lexeme != null) {
+						System.out.print(oper1.lexeme + " ");
+					}
+					if (parent.children[i].floatConversion) {
 						System.out.print("s>f ");
 					}
 
-					System.out.print(oper2.lexeme + " ");
+					oper2 = traverse(parent.children[++i], false);
+					if (oper2.lexeme != null) {
+						System.out.print(oper2.lexeme + " ");
+					}
 					if ((oper1.tag == Tag.REAL) && (oper2.tag != Tag.REAL)) {
 						System.out.print("s>f ");
 					}
 
 					if ((oper1.tag == Tag.REAL) || (oper2.tag == Tag.REAL)) {
+						floatFlag = true;
+						System.out.print("f");
+					}
+					System.out.print(child.lexeme + " ");
+
+				} else if (child.tok.isUnop()) {
+					oper1 = traverse(parent.children[++i], true);
+					if (oper1.tag == Tag.REAL) {
+						floatFlag = true;
 						System.out.print("f");
 					}
 					System.out.print(child.lexeme + " ");
 
 				} else if (child.tok.isConstant()) {
 					/* If we have a Constant pass it up the tree */
+					//System.err.println("Child is constant");// debug
+					if (willPrint == true) {
+						System.out.print(child.lexeme + " ");
+					}
 					return child;
 				}
 			} else {
-				System.err.println("  This child is a nonterminal");//debug
-				return traverse(child);
+				//System.err.println("  This child is a nonterminal");// debug
+				return traverse(child, willPrint);
 			}
 		}
-		return null; // added to stop eclipse from complaining; this line should never be reached
+
+		if (floatFlag) {
+			Node node = new Node(Tag.REAL, null);
+			return node;
+		} else {
+			Node node = new Node(0, null);
+			return node;
+		}
+		// return null; // added to stop eclipse from complaining; this line
+		// should
+		// never be reached
+	}
+
+	public void setFloatConversion() {
+		this.floatConversion = true;
+	}
+	
+	/**
+	 * Set the floatConversion flag for every appropriate node in the tree.
+	 * @param parent
+	 * @return
+	 */
+	public static Node floatConverter(Node parent) {
+		boolean unaryMinus = false;
+		boolean floatFlag = false;
+		for (int i = 0; i < 6; i++) { // Run through all children
+			Node oper1;
+			Node oper2;
+			Node child = parent.children[i];
+			if (child == null) {
+				break;
+			}
+			if (child.lexeme != null) {
+				if (child.getTag() == Tag.MINUS) {
+					if (parent.children[i + 2].tag == 0) {
+						// is binary
+					} else {
+						// it’s unary
+						unaryMinus = true;
+					}
+				}
+				if (unaryMinus && child.tok.isUnop()) {
+					oper1 = floatConverter(parent.children[++i]);
+					if (oper1.tag == Tag.REAL) {
+						floatFlag = true;
+					}
+				} else if (child.tok.isBinop()) {
+					oper1 = floatConverter(parent.children[++i]);
+					oper2 = floatConverter(parent.children[++i]);
+
+					if ((oper1.tag != Tag.REAL) && (oper2.tag == Tag.REAL)) {
+						parent.children[i-1].setFloatConversion();
+					}
+					if ((oper1.tag == Tag.REAL) || (oper2.tag == Tag.REAL)) {
+						floatFlag = true;
+					}
+
+				} else if (child.tok.isUnop()) {
+					oper1 = Node.floatConverter(parent.children[++i]);
+					if (oper1.tag == Tag.REAL) {
+						floatFlag = true;
+					}
+
+				} else if (child.tok.isConstant()) {
+					/* If we have a Constant pass it up the tree */
+					return child;
+
+				}
+			} else {
+				return floatConverter(child);
+			}
+		}
+
+		if (floatFlag) {
+			Node node = new Node(Tag.REAL, null);
+			return node;
+		} else {
+			Node node = new Node(0, null);
+			return node;
+		}
+		//return node;
 	}
 
 }
