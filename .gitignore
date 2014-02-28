@@ -1,0 +1,9 @@
+# Ignore extraneous makefiles
+makefile~
+Makefile~
+Makefile (copy)
+Makefile (another copy)
+
+# ignore compiled code
+test.jar
+bin/
