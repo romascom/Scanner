@@ -18,8 +18,8 @@ public class Parser { // see pg. 982 of the text
 		nextToken();
 		Node root = T(); // start building tree
 		System.err.println("Tree has been created");
-		Node.traverse(root);
-		//root.printSymbolTree(0);
+		//Node.traverse(root);
+		root.printSymbolTree(0);
 	}
 
 	/**
