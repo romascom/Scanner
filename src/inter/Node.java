@@ -8,7 +8,9 @@ public class Node {
 	private String lexeme = null;
 	private Token tok;
 	private int i = 0;
-	private boolean floatConversion = false; // flag for determining whether a given number must be converted to a float
+	private boolean floatConversion = false; // flag for determining whether a
+												// given number must be
+												// converted to a float
 
 	public Node() {
 	}
@@ -81,9 +83,19 @@ public class Node {
 		i++;
 	}
 
+	/**
+	 * Recursively traverses the supplied tree. Outputs gforth code.
+	 * 
+	 * @param parent
+	 *            The node being traversed
+	 * @param print
+	 *            True if we want to print all of the tree's lexemes (excluding
+	 *            square brackets); otherwise False
+	 * @return
+	 */
 	public static Node traverse(Node parent, boolean print) {
 		boolean willPrint = print;
-		//System.err.println("parent.lexeme: " + parent.lexeme);// debug
+		// System.err.println("parent.lexeme: " + parent.lexeme);// debug
 		boolean unaryMinus = false;
 		boolean floatFlag = false;
 		for (int i = 0; i < 6; i++) { // Run through all children
@@ -94,8 +106,8 @@ public class Node {
 			if (child == null) {
 				break;
 			}
-			//System.err.println("child.lexeme: " + child.lexeme);// debug
-			//System.err.println("  child.tag: " + child.tag);// debug
+			// System.err.println("child.lexeme: " + child.lexeme);// debug
+			// System.err.println("  child.tag: " + child.tag);// debug
 			if (child.lexeme != null) {
 				if (child.getTag() == Tag.MINUS) {
 					if (parent.children[i + 2].lexeme == null) { // && lexeme !=
@@ -103,7 +115,8 @@ public class Node {
 						// is binary
 					} else {
 						// it’s unary
-						//System.err.println("unaryMinus has been set to true");// debug
+						//System.err.println("unaryMinus has been set to true");//
+						// debug
 						unaryMinus = true;
 					}
 				}
@@ -116,29 +129,36 @@ public class Node {
 
 					System.out.print(child.lexeme + " ");
 				} else if (child.tok.isBinop()) {
-					//System.out.println("  This child is a binary operator");// debug
-					oper1 = traverse(parent.children[++i], false);
+					// System.out.println("  This child is a binary operator");//
+					// debug
+					oper1 = traverse(parent.children[++i], willPrint);
 
-					if (oper1.lexeme != null) {
+					/*if (oper1.lexeme != null && willPrint == true) {
 						System.out.print(oper1.lexeme + " ");
-					}
-					if (parent.children[i].floatConversion) {
+					}*/
+					if (parent.children[i].floatConversion && willPrint == true) {
 						System.out.print("s>f ");
 					}
 
-					oper2 = traverse(parent.children[++i], false);
-					if (oper2.lexeme != null) {
+					oper2 = traverse(parent.children[++i], willPrint);
+					/*if (oper2.lexeme != null && willPrint == true) {
 						System.out.print(oper2.lexeme + " ");
-					}
-					if ((oper1.tag == Tag.REAL) && (oper2.tag != Tag.REAL)) {
+					}*/
+					if ((oper1.tag == Tag.REAL) && (oper2.tag != Tag.REAL)
+							&& willPrint == true) {
 						System.out.print("s>f ");
 					}
 
 					if ((oper1.tag == Tag.REAL) || (oper2.tag == Tag.REAL)) {
 						floatFlag = true;
-						System.out.print("f");
+						if (willPrint == true) {
+							System.out.print("f");
+						}
 					}
-					System.out.print(child.lexeme + " ");
+
+					if (willPrint == true) {
+						System.out.print(child.lexeme + " ");
+					}
 
 				} else if (child.tok.isUnop()) {
 					oper1 = traverse(parent.children[++i], true);
@@ -148,6 +168,28 @@ public class Node {
 					}
 					System.out.print(child.lexeme + " ");
 
+				} else if (child.tok.tag == Tag.IF) {
+					traverse(parent.children[++i], true);
+					System.out.print("if ");
+					traverse(parent.children[++i], true);
+				} else if (child.tok.tag == Tag.STDOUT) {
+					oper1 = traverse(parent.children[++i], false);
+					switch (oper1.tag) {
+					case Tag.STRING:
+						System.out.print(".\" " + oper1.lexeme + "\"");
+						break;
+					case Tag.REAL:
+						traverse(parent.children[i], true);
+						System.out.print(". ");
+						break;
+					default:
+						traverse(parent.children[i], true);
+						/*if (oper1.lexeme != null) {
+							System.out.print(oper1.lexeme + " ");
+						}*/
+						System.out.print(". ");
+						break;
+					}
 				} else if (child.tok.isConstant()) {
 					/* If we have a Constant pass it up the tree */
 					//System.err.println("Child is constant");// debug
@@ -157,12 +199,13 @@ public class Node {
 					return child;
 				}
 			} else {
-				//System.err.println("  This child is a nonterminal");// debug
+				// System.err.println("  This child is a nonterminal");// debug
 				return traverse(child, willPrint);
 			}
 		}
 
 		if (floatFlag) {
+			// System.err.println("This is a float");//debug
 			Node node = new Node(Tag.REAL, null);
 			return node;
 		} else {
@@ -177,10 +220,13 @@ public class Node {
 	public void setFloatConversion() {
 		this.floatConversion = true;
 	}
-	
+
 	/**
-	 * Set the floatConversion flag for every appropriate node in the tree.
+	 * Recursively marks the nodes of the supplied tree if their lexemes need to
+	 * be converted to floating point values.
+	 * 
 	 * @param parent
+	 *            The supplied tree's root node
 	 * @return
 	 */
 	public static Node floatConverter(Node parent) {
@@ -212,7 +258,7 @@ public class Node {
 					oper2 = floatConverter(parent.children[++i]);
 
 					if ((oper1.tag != Tag.REAL) && (oper2.tag == Tag.REAL)) {
-						parent.children[i-1].setFloatConversion();
+						parent.children[i - 1].setFloatConversion();
 					}
 					if ((oper1.tag == Tag.REAL) || (oper2.tag == Tag.REAL)) {
 						floatFlag = true;
@@ -241,7 +287,7 @@ public class Node {
 			Node node = new Node(0, null);
 			return node;
 		}
-		//return node;
+		// return node;
 	}
 
 }
