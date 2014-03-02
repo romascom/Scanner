@@ -169,14 +169,20 @@ public class Node {
 					System.out.print(child.lexeme + " ");
 
 				} else if (child.tok.tag == Tag.IF) {
+					System.out.print(": def "); // define new word
 					traverse(parent.children[++i], true);
 					System.out.print("if ");
 					traverse(parent.children[++i], true);
+					if (parent.children[++i].tag != Tag.RSB) { // if else stmt exists
+						System.out.print("else ");
+						traverse(parent.children[i], true);
+					}
+					System.out.print("endif ; def "); // call new word
 				} else if (child.tok.tag == Tag.STDOUT) {
 					oper1 = traverse(parent.children[++i], false);
 					switch (oper1.tag) {
 					case Tag.STRING:
-						System.out.print(".\" " + oper1.lexeme + "\"");
+						System.out.print(".\" " + oper1.lexeme + "\" ");
 						break;
 					case Tag.REAL:
 						traverse(parent.children[i], true);
