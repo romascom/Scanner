@@ -170,7 +170,7 @@ public class Node {
 					}
 					if (child.lexeme.equals("not")) {
 						System.out.print("negate ");
-					} else {
+					} else { // it's either sin, cos, or tan
 						System.out.print(child.lexeme + " ");
 					}
 
@@ -280,6 +280,11 @@ public class Node {
 					}
 					if ((oper1.tag == Tag.REAL) || (oper2.tag == Tag.REAL)) {
 						floatFlag = true;
+					}
+					// type check
+					if ((oper1.tag == Tag.REAL) && (oper2.tag == Tag.STRING)) {
+						System.err.println("A binary operation cannot be performed on a float and a string");
+						System.exit(1);
 					}
 
 				} else if (child.tok.isUnop()) {
