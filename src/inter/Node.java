@@ -115,35 +115,37 @@ public class Node {
 						// is binary
 					} else {
 						// it’s unary
-						//System.err.println("unaryMinus has been set to true");//
+						// System.err.println("unaryMinus has been set to true");//
 						// debug
 						unaryMinus = true;
 					}
 				}
-				if (unaryMinus && child.tok.isUnop()) {
+				if (unaryMinus && child.tok.isUnop()) { // Why do we need isUnop() here?
 					oper1 = traverse(parent.children[++i], true);
 					if (oper1.tag == Tag.REAL) {
 						floatFlag = true;
 						System.out.print("f");
 					}
-
-					System.out.print(child.lexeme + " ");
+					System.out.print("negate ");
+					//System.out.print(child.lexeme + " ");
 				} else if (child.tok.isBinop()) {
 					// System.out.println("  This child is a binary operator");//
 					// debug
 					oper1 = traverse(parent.children[++i], willPrint);
 
-					/*if (oper1.lexeme != null && willPrint == true) {
-						System.out.print(oper1.lexeme + " ");
-					}*/
+					/*
+					 * if (oper1.lexeme != null && willPrint == true) {
+					 * System.out.print(oper1.lexeme + " "); }
+					 */
 					if (parent.children[i].floatConversion && willPrint == true) {
 						System.out.print("s>f ");
 					}
 
 					oper2 = traverse(parent.children[++i], willPrint);
-					/*if (oper2.lexeme != null && willPrint == true) {
-						System.out.print(oper2.lexeme + " ");
-					}*/
+					/*
+					 * if (oper2.lexeme != null && willPrint == true) {
+					 * System.out.print(oper2.lexeme + " "); }
+					 */
 					if ((oper1.tag == Tag.REAL) && (oper2.tag != Tag.REAL)
 							&& willPrint == true) {
 						System.out.print("s>f ");
@@ -166,14 +168,19 @@ public class Node {
 						floatFlag = true;
 						System.out.print("f");
 					}
-					System.out.print(child.lexeme + " ");
+					if (child.lexeme.equals("not")) {
+						System.out.print("negate ");
+					} else {
+						System.out.print(child.lexeme + " ");
+					}
 
 				} else if (child.tok.tag == Tag.IF) {
 					System.out.print(": def "); // define new word
 					traverse(parent.children[++i], true);
 					System.out.print("if ");
 					traverse(parent.children[++i], true);
-					if (parent.children[++i].tag != Tag.RSB) { // if else stmt exists
+					if (parent.children[++i].tag != Tag.RSB) { // if else stmt
+																// exists
 						System.out.print("else ");
 						traverse(parent.children[i], true);
 					}
@@ -190,18 +197,23 @@ public class Node {
 						break;
 					default:
 						traverse(parent.children[i], true);
-						/*if (oper1.lexeme != null) {
-							System.out.print(oper1.lexeme + " ");
-						}*/
+						/*
+						 * if (oper1.lexeme != null) {
+						 * System.out.print(oper1.lexeme + " "); }
+						 */
 						System.out.print(". ");
 						break;
 					}
 				} else if (child.tok.isConstant()) {
 					/* If we have a Constant pass it up the tree */
-					//System.err.println("Child is constant");// debug
+					// System.err.println("Child is constant");// debug
 					if (willPrint == true) {
-						System.out.print(child.lexeme + " ");
+						System.out.print(child.lexeme);
 					}
+					if (child.tok.tag == Tag.REAL && !child.tok.lexeme.endsWith("e")) {
+						System.out.print("e");
+					}
+					System.out.print(" ");
 					return child;
 				}
 			} else {
