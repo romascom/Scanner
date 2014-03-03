@@ -120,14 +120,15 @@ public class Node {
 						unaryMinus = true;
 					}
 				}
-				if (unaryMinus && child.tok.isUnop()) { // Why do we need isUnop() here?
+				if (unaryMinus && child.tok.isUnop()) { // Why do we need
+														// isUnop() here?
 					oper1 = traverse(parent.children[++i], true);
 					if (oper1.tag == Tag.REAL) {
 						floatFlag = true;
 						System.out.print("f");
 					}
 					System.out.print("negate ");
-					//System.out.print(child.lexeme + " ");
+					// System.out.print(child.lexeme + " ");
 				} else if (child.tok.isBinop()) {
 					// System.out.println("  This child is a binary operator");//
 					// debug
@@ -159,7 +160,11 @@ public class Node {
 					}
 
 					if (willPrint == true) {
-						System.out.print(child.lexeme + " ");
+						if (child.tag == Tag.POW) {
+							System.out.print("** ");
+						} else {
+							System.out.print(child.lexeme + " ");
+						}
 					}
 
 				} else if (child.tok.isUnop()) {
@@ -210,7 +215,8 @@ public class Node {
 					if (willPrint == true) {
 						System.out.print(child.lexeme);
 					}
-					if (child.tok.tag == Tag.REAL && !child.tok.lexeme.endsWith("e")) {
+					if (child.tok.tag == Tag.REAL
+							&& !child.tok.lexeme.endsWith("e")) {
 						System.out.print("e");
 					}
 					System.out.print(" ");
@@ -283,7 +289,8 @@ public class Node {
 					}
 					// type check
 					if ((oper1.tag == Tag.REAL) && (oper2.tag == Tag.STRING)) {
-						System.err.println("A binary operation cannot be performed on a float and a string");
+						System.err
+								.println("A binary operation cannot be performed on a float and a string");
 						System.exit(1);
 					}
 
