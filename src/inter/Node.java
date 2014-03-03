@@ -162,6 +162,8 @@ public class Node {
 					if (willPrint == true) {
 						if (child.tag == Tag.POW) {
 							System.out.print("** ");
+						} else if (child.tag == Tag.MOD) {
+							System.out.print("mod ");
 						} else {
 							System.out.print(child.lexeme + " ");
 						}
@@ -216,9 +218,10 @@ public class Node {
 						System.out.print(child.lexeme);
 					}
 					if (child.tok.tag == Tag.REAL
-							&& !child.tok.lexeme.endsWith("e")) {
+							&& !child.tok.lexeme.contains("e")) {
 						System.out.print("e");
 					}
+					
 					System.out.print(" ");
 					return child;
 				}
