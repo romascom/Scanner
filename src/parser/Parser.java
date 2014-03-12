@@ -31,23 +31,21 @@ public class Parser { // see pg. 982 of the text
 	 * @throws IOException
 	 */
 	void nextToken() throws IOException {
-		System.err.println("nextToken() was called");// debug
+		//System.err.println("nextToken() was called");// debug
 		if (lookahead == null) {
-			System.err.println("lookahead is null");// debug
+			//System.err.println("lookahead is null");// debug
 			lookahead = lex.scan();
-			System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
+			//System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
 		} else {
 			lookahead = lookaheadTwo;
 		}
 
 		lookaheadTwo = lex.scan();
 
-		System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
+		/*System.err.println("lookahead.lexeme is " + lookahead.lexeme);//debug
 		System.err.println("lookahead.tag is " + lookahead.tag);//debug
-		System.err.println("\nlookaheadTwo.lexeme is " +
-		lookaheadTwo.lexeme);//debug
-		System.err.println("\nlookaheadTwo.tag is " +
-		lookaheadTwo.tag);//debug
+		System.err.println("\nlookaheadTwo.lexeme is " + lookaheadTwo.lexeme);//debug
+		System.err.println("\nlookaheadTwo.tag is " + lookaheadTwo.tag);//debug*/
 	}
 
 	void error(String s) {
@@ -67,7 +65,7 @@ public class Parser { // see pg. 982 of the text
 	 * @throws IOException
 	 */
 	void match(int t, Node node) {
-		System.err.println("Tag to match: " + t);// debug
+		//System.err.println("Tag to match: " + t);// debug
 		if (lookahead.tag == Tag.EOF) {
 			return;
 		}

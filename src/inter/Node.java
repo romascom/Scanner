@@ -8,6 +8,7 @@ public class Node {
 	private String lexeme = null;
 	private Token tok;
 	private int i = 0;
+	private boolean stringConcat = false;
 	private boolean floatConversion = false; // flag for determining whether a
 												// given number must be
 												// converted to a float
@@ -64,17 +65,16 @@ public class Node {
 
 	public void addChild(Token t) { // TODO maybe I need to pass the node in
 									// instead of the token
-		System.err.println("Child added:");
+		/*System.err.println("Child added:");
 		System.err.println("	t.tag: " + t.tag);
 		System.err.println("	t.lexeme: " + t.lexeme);
-		System.err.println("CHILD #" + i);
+		System.err.println("CHILD #" + i);*/
 		Node child = new Node(t);
 		child.tag = t.tag; // TODO remove this, eventually
 		child.lexeme = t.lexeme;
 		// Node child = new Node(t.tag, t.lexeme);
 		this.children[i] = child;
-		System.err
-				.println("children[" + i + "].lexeme = " + children[i].lexeme);// debug
+		//System.err.println("children[" + i + "].lexeme = " + children[i].lexeme);// debug
 		i++;
 	}
 
@@ -132,6 +132,16 @@ public class Node {
 				} else if (child.tok.isBinop()) {
 					// System.out.println("  This child is a binary operator");//
 					// debug
+					if (parent.children[i].stringConcat == true) { // concatenation
+						oper1 = traverse(parent.children[++i], false);
+						oper2 = traverse(parent.children[++i], false);
+						if (willPrint == true) {
+							System.out.print("s\" " + oper1.tok.lexeme
+									+ "\" s\" " + oper2.tok.lexeme + "\" s+ ");
+						}
+						return new Node(Tag.STRING, null);
+					}
+
 					oper1 = traverse(parent.children[++i], willPrint);
 
 					/*
@@ -196,9 +206,19 @@ public class Node {
 					oper1 = traverse(parent.children[++i], false);
 					switch (oper1.tag) {
 					case Tag.STRING:
-						System.out.print(".\" " + oper1.lexeme + "\" ");
+						//System.out.print(".\" " + oper1.lexeme + "\" ");
+						//System.out.print("s\" " + oper1.lexeme + "\" type ");
+						if (oper1.lexeme == null) {
+						traverse(parent.children[i], true);} else {
+							System.out.print("s\" " + oper1.lexeme + "\" ");
+						}
+						System.out.print("type ");
 						break;
 					case Tag.REAL:
+						traverse(parent.children[i], true);
+						System.out.print("f. ");
+						break;
+					case Tag.NUM:
 						traverse(parent.children[i], true);
 						System.out.print(". ");
 						break;
@@ -208,6 +228,7 @@ public class Node {
 						 * if (oper1.lexeme != null) {
 						 * System.out.print(oper1.lexeme + " "); }
 						 */
+						//System.out.print(". ");
 						System.out.print(". ");
 						break;
 					}
@@ -221,7 +242,7 @@ public class Node {
 							&& !child.tok.lexeme.contains("e")) {
 						System.out.print("e");
 					}
-					
+
 					System.out.print(" ");
 					return child;
 				}
@@ -248,9 +269,14 @@ public class Node {
 		this.floatConversion = true;
 	}
 
+	public void setStringConcat() {
+		this.stringConcat = true;
+	}
+
 	/**
-	 * Recursively marks the nodes of the supplied tree if their lexemes need to
-	 * be converted to floating point values.
+	 * Recursively marks the nodes of the supplied tree if either their lexemes
+	 * need to be converted to floating point values or the two operands are
+	 * strings that need to be concatenated.
 	 * 
 	 * @param parent
 	 *            The supplied tree's root node
@@ -296,6 +322,13 @@ public class Node {
 								.println("A binary operation cannot be performed on a float and a string");
 						System.exit(1);
 					}
+					if (oper1.tok != null && oper2.tok != null) {
+						if (child.tok.tag == Tag.PLUS
+								&& oper1.tok.tag == Tag.STRING
+								&& oper2.tok.tag == Tag.STRING) { // concatenation
+							parent.children[i - 2].setStringConcat();
+						}
+					}
 
 				} else if (child.tok.isUnop()) {
 					oper1 = Node.floatConverter(parent.children[++i]);
@@ -322,5 +355,4 @@ public class Node {
 		}
 		// return node;
 	}
-
 }
