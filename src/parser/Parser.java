@@ -20,7 +20,7 @@ public class Parser { // see pg. 982 of the text
 		System.err.println("Tree has been created");
 		root.printSymbolTree(0);
 		Node.floatConverter(root);
-		Node.traverse(root, true);
+		Node.traverse(root, true, false);
 		//root.printSymbolTree(0);
 	}
 

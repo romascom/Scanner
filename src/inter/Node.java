@@ -8,6 +8,8 @@ public class Node {
 	private String lexeme = null;
 	private Token tok;
 	private int i = 0;
+	// private boolean isNestedComp = false; // True if node is nested within a
+	// node that has Gforth compilation semantics
 	private boolean stringConcat = false;
 	private boolean floatConversion = false; // flag for determining whether a
 												// given number must be
@@ -65,16 +67,18 @@ public class Node {
 
 	public void addChild(Token t) { // TODO maybe I need to pass the node in
 									// instead of the token
-		/*System.err.println("Child added:");
-		System.err.println("	t.tag: " + t.tag);
-		System.err.println("	t.lexeme: " + t.lexeme);
-		System.err.println("CHILD #" + i);*/
+		/*
+		 * System.err.println("Child added:"); System.err.println("	t.tag: " +
+		 * t.tag); System.err.println("	t.lexeme: " + t.lexeme);
+		 * System.err.println("CHILD #" + i);
+		 */
 		Node child = new Node(t);
 		child.tag = t.tag; // TODO remove this, eventually
 		child.lexeme = t.lexeme;
 		// Node child = new Node(t.tag, t.lexeme);
 		this.children[i] = child;
-		//System.err.println("children[" + i + "].lexeme = " + children[i].lexeme);// debug
+		// System.err.println("children[" + i + "].lexeme = " +
+		// children[i].lexeme);// debug
 		i++;
 	}
 
@@ -91,9 +95,14 @@ public class Node {
 	 * @param print
 	 *            True if we want to print all of the tree's lexemes (excluding
 	 *            square brackets); otherwise False
+	 * @param inDef
+	 *            True if the node being traversed is in a subtree, where the
+	 *            root corresponds to a Gforth compile-only construct; otherwise
+	 *            False
 	 * @return
 	 */
-	public static Node traverse(Node parent, boolean print) {
+	public static Node traverse(Node parent, boolean print, boolean inDef) {
+		boolean def = inDef;
 		boolean willPrint = print;
 		// System.err.println("parent.lexeme: " + parent.lexeme);// debug
 		boolean unaryMinus = false;
@@ -122,7 +131,7 @@ public class Node {
 				}
 				if (unaryMinus && child.tok.isUnop()) { // Why do we need
 														// isUnop() here?
-					oper1 = traverse(parent.children[++i], true);
+					oper1 = traverse(parent.children[++i], true, def);
 					if (oper1.tag == Tag.REAL) {
 						floatFlag = true;
 						System.out.print("f");
@@ -133,8 +142,8 @@ public class Node {
 					// System.out.println("  This child is a binary operator");//
 					// debug
 					if (parent.children[i].stringConcat == true) { // concatenation
-						oper1 = traverse(parent.children[++i], false);
-						oper2 = traverse(parent.children[++i], false);
+						oper1 = traverse(parent.children[++i], false, def);
+						oper2 = traverse(parent.children[++i], false, def);
 						if (willPrint == true) {
 							System.out.print("s\" " + oper1.tok.lexeme
 									+ "\" s\" " + oper2.tok.lexeme + "\" s+ ");
@@ -142,7 +151,7 @@ public class Node {
 						return new Node(Tag.STRING, null);
 					}
 
-					oper1 = traverse(parent.children[++i], willPrint);
+					oper1 = traverse(parent.children[++i], willPrint, def);
 
 					/*
 					 * if (oper1.lexeme != null && willPrint == true) {
@@ -152,7 +161,7 @@ public class Node {
 						System.out.print("s>f ");
 					}
 
-					oper2 = traverse(parent.children[++i], willPrint);
+					oper2 = traverse(parent.children[++i], willPrint, def);
 					/*
 					 * if (oper2.lexeme != null && willPrint == true) {
 					 * System.out.print(oper2.lexeme + " "); }
@@ -180,7 +189,7 @@ public class Node {
 					}
 
 				} else if (child.tok.isUnop()) {
-					oper1 = traverse(parent.children[++i], true);
+					oper1 = traverse(parent.children[++i], true, def);
 					if (oper1.tag == Tag.REAL) {
 						floatFlag = true;
 						System.out.print("f");
@@ -192,43 +201,51 @@ public class Node {
 					}
 
 				} else if (child.tok.tag == Tag.IF) {
-					System.out.print(": def "); // define new word
-					traverse(parent.children[++i], true);
+					// TODO: May need to ensure that definitions are unique
+					if (def == false) {
+						System.out.print(": def "); // define new word
+						def = true;
+					}
+					traverse(parent.children[++i], true, def);
 					System.out.print("if ");
-					traverse(parent.children[++i], true);
+					traverse(parent.children[++i], true, def);
 					if (parent.children[++i].tag != Tag.RSB) { // if else stmt
 																// exists
 						System.out.print("else ");
-						traverse(parent.children[i], true);
+						traverse(parent.children[i], true, def);
 					}
-					System.out.print("endif ; def "); // call new word
+					System.out.print("endif ");
+					if (inDef == false) {
+						System.out.print("; def "); // call new word
+					}
 				} else if (child.tok.tag == Tag.STDOUT) {
-					oper1 = traverse(parent.children[++i], false);
+					oper1 = traverse(parent.children[++i], false, def);
 					switch (oper1.tag) {
 					case Tag.STRING:
-						//System.out.print(".\" " + oper1.lexeme + "\" ");
-						//System.out.print("s\" " + oper1.lexeme + "\" type ");
+						// System.out.print(".\" " + oper1.lexeme + "\" ");
+						// System.out.print("s\" " + oper1.lexeme + "\" type ");
 						if (oper1.lexeme == null) {
-						traverse(parent.children[i], true);} else {
+							traverse(parent.children[i], true, def);
+						} else {
 							System.out.print("s\" " + oper1.lexeme + "\" ");
 						}
 						System.out.print("type ");
 						break;
 					case Tag.REAL:
-						traverse(parent.children[i], true);
+						traverse(parent.children[i], true, def);
 						System.out.print("f. ");
 						break;
 					case Tag.NUM:
-						traverse(parent.children[i], true);
+						traverse(parent.children[i], true, def);
 						System.out.print(". ");
 						break;
 					default:
-						traverse(parent.children[i], true);
+						traverse(parent.children[i], true, def);
 						/*
 						 * if (oper1.lexeme != null) {
 						 * System.out.print(oper1.lexeme + " "); }
 						 */
-						//System.out.print(". ");
+						// System.out.print(". ");
 						System.out.print(". ");
 						break;
 					}
@@ -248,7 +265,7 @@ public class Node {
 				}
 			} else {
 				// System.err.println("  This child is a nonterminal");// debug
-				return traverse(child, willPrint);
+				return traverse(child, willPrint, def);
 			}
 		}
 
