@@ -304,7 +304,7 @@ public class Parser { // see pg. 982 of the text
 
 	private Node type() {
 		Node node = new Node();
-		switch (lookahead.lexeme) {
+		/*switch (lookahead.lexeme) {
 		case "int":
 			match(Tag.BASIC, node);
 			break;
@@ -320,6 +320,18 @@ public class Parser { // see pg. 982 of the text
 		default:
 			error("syntax error");
 			break;
+		}*/
+		
+		if (lookahead.lexeme.equals("int")) {
+			match(Tag.BASIC, node);
+		} else if (lookahead.lexeme.equals("string")) {
+			match(Tag.BASIC, node);
+		} else if (lookahead.lexeme.equals("float")) {
+			match(Tag.BASIC, node);
+		} else if (lookahead.lexeme.equals("bool")) {
+			match(Tag.BASIC, node);
+		} else {
+			error("syntax error");
 		}
 
 		return node;
