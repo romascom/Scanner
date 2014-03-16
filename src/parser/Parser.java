@@ -21,6 +21,7 @@ public class Parser { // see pg. 982 of the text
 		root.printSymbolTree(0);
 		Node.floatConverter(root);
 		Node.traverse(root, true, false);
+		// TODO: Print 2create definition
 		//root.printSymbolTree(0);
 	}
 

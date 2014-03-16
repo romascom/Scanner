@@ -98,14 +98,20 @@ public class Node {
 	public void setType(String t) {
 		this.type = t; // should be “float” “int” “string” or “bool”
 	}
-	
-	public static void traverseVarlist(Node parent) {
+
+	public static void traverseVarlist(Node parent, boolean willPrint) {
 		String name = parent.children[1].children[0].lexeme;
 		String type = parent.children[2].children[0].lexeme;
-		System.out.print("create " + name + " ");
+		if (willPrint) {
+			if (type.equals("string")) {
+				System.out.print("2create " + name + " ");
+			} else {
+				System.out.print("create " + name + " ");
+			}
+		}
 		variables.put(name, type);
 		if (parent.children[4] != null) {
-		traverseVarlist(parent.children[4]);
+			traverseVarlist(parent.children[4], willPrint);
 		}
 	}
 
@@ -130,11 +136,13 @@ public class Node {
 		boolean unaryMinus = false;
 		boolean floatFlag = false;
 		for (int i = 0; i < 6; i++) { // Run through all children
+			// System.err.println("i is " + i);//debug
 			Node oper1;
 			Node oper2;
 			Node child = parent.children[i];
 
 			if (child == null) {
+				// System.err.println("Child is null!"); //debug
 				break;
 			}
 			// System.err.println("child.lexeme: " + child.lexeme);// debug
@@ -160,6 +168,24 @@ public class Node {
 					}
 					System.out.print("negate ");
 					// System.out.print(child.lexeme + " ");
+				} else if (child.tok.tag == Tag.ASSIGN) {
+					// System.err.println("Let's assign some stuff!");//debug
+					oper1 = traverse(parent.children[++i], false, def);
+					oper2 = traverse(parent.children[++i], willPrint, def);
+					// System.err.println("oper1.lexeme: " +
+					// oper1.lexeme);//debug
+					if (variables.get(oper1.lexeme).equals("float")
+							&& oper2.tok.tag == Tag.NUM) {
+						System.out.print("s>f ");
+					}
+					System.out.print(oper1.lexeme + " ");
+					if (variables.get(oper1.lexeme).equals("float")) {
+						System.out.print(" f");
+					} else if (variables.get(oper1.lexeme).equals("string")) {
+						System.out.print(" 2");
+					}
+					System.out.print("! ");
+					return new Node(Tag.ASSIGN, null);
 				} else if (child.tok.isBinop()) {
 					// System.out.println("  This child is a binary operator");//
 					// debug
@@ -173,6 +199,20 @@ public class Node {
 						return new Node(Tag.STRING, null);
 					}
 
+					/*
+					 * oper1 = traverse(parent.children[++i], false, def); oper2
+					 * = traverse(parent.children[++i], false, def); if
+					 * ((oper1.tag == Tag.ID) && (oper2.tag == Tag.ID)) { String
+					 * type1 = variables.get(oper1.lexeme); String type2 =
+					 * variables.get(oper2.lexeme);
+					 * System.out.print(oper1.lexeme + " "); if
+					 * (!type1.equals(type2)) { if (type1.equals("int") &&
+					 * type2.equals("float")) { System.out.print(" @ s>f " +
+					 * oper2.lexeme + " f@ "); } else if (type1.equals("float")
+					 * && type2.equals("int")) { System.out.print(" f@ " +
+					 * oper2.lexeme + " @ s>f "); } } }
+					 */
+
 					oper1 = traverse(parent.children[++i], willPrint, def);
 
 					/*
@@ -184,6 +224,7 @@ public class Node {
 					}
 
 					oper2 = traverse(parent.children[++i], willPrint, def);
+
 					/*
 					 * if (oper2.lexeme != null && willPrint == true) {
 					 * System.out.print(oper2.lexeme + " "); }
@@ -242,27 +283,8 @@ public class Node {
 					}
 				} else if (child.tag == Tag.LET) {
 					i = i + 2;
-					traverseVarlist(parent.children[i]);
-				} else if (child.tok.tag == Tag.ID) {
-					System.out.print("create " + child.tok.lexeme + " ");
-					variables.put(child.tok.lexeme, "");
-					System.err.println(i);
-					//System.err.println(parent.children[2].lexeme);
-					traverse(parent.children[++i], true, def);
-					i++; // skip RSB
-					if (parent.children[++i] != null) {
-						traverse(parent.children[i], false, def);
-					}
-					//return child;
-				} else if (child.tok.tag == Tag.BASIC) {
-					if (child.lexeme.equals("int")
-							|| child.lexeme.equals("float")
-							|| child.lexeme.equals("bool")
-							|| child.lexeme.equals("string")) {
-						variables.put(parent.children[i - 1].tok.lexeme,
-								child.lexeme);
-					}
-					//return child;
+					traverseVarlist(parent.children[i], willPrint);
+					return new Node(Tag.LET, null);
 				} else if (child.tok.tag == Tag.STDOUT) {
 					oper1 = traverse(parent.children[++i], false, def);
 					switch (oper1.tag) {
@@ -294,10 +316,20 @@ public class Node {
 						System.out.print(". ");
 						break;
 					}
-				} else if (child.tok.isConstant()) {
-					/* If we have a Constant pass it up the tree */
-					// System.err.println("Child is constant");// debug
+				} else if (child.tok.isName()) {
 					if (willPrint == true) {
+						System.out.print(child.lexeme);
+					}
+					return child;
+				} else if (child.tok.isConstant()) {
+					if (willPrint == true) {
+						if (child.tok.tag == Tag.STRING) {
+							System.out.print("s\" " + child.lexeme + "\" ");
+							return child;
+						}
+						/* If we have a Constant pass it up the tree */
+						// System.err.println("Child is constant");// debug
+
 						System.out.print(child.lexeme);
 					}
 					if (child.tok.tag == Tag.REAL
@@ -308,15 +340,22 @@ public class Node {
 					System.out.print(" ");
 					return child;
 				}
-			} /*else if (child.children[0].tok.tag != 0) {
-				if (child.children[0].tok.tag == Tag.ID || child.children[0].tok.tag == Tag.BASIC) {
-					
-				} else {
-					return traverse(child, willPrint, def);
-				}
-			}*/ else {
+			} /*
+			 * else if (child.children[0].tok.tag != 0) { if
+			 * (child.children[0].tok.tag == Tag.ID || child.children[0].tok.tag
+			 * == Tag.BASIC) {
+			 * 
+			 * } else { return traverse(child, willPrint, def); } }
+			 */else {
 				// System.err.println("  This child is a nonterminal");// debug
-				return traverse(child, willPrint, def);
+
+				Node result = traverse(child, willPrint, def);
+				if (parent.children[1] != null
+						&& parent.children[0].tok == null
+						&& parent.children[2] == null) { // S -> SS
+					traverse(parent.children[1], willPrint, def);
+				}
+				return result;
 			}
 		}
 
