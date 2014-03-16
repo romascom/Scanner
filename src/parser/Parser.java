@@ -20,6 +20,7 @@ public class Parser { // see pg. 982 of the text
 		System.err.println("Tree has been created");
 		root.printSymbolTree(0);
 		Node.floatConverter(root);
+		System.out.print(": 2create create 0 , 0 , ; ");
 		Node.traverse(root, true, false);
 		// TODO: Print 2create definition
 		//root.printSymbolTree(0);

@@ -189,12 +189,20 @@ public class Node {
 				} else if (child.tok.isBinop()) {
 					// System.out.println("  This child is a binary operator");//
 					// debug
+					
+					/*oper1 = traverse(parent.children[++i], false, def);
+					oper2 = traverse(parent.children[++i], false, def);
+					if (oper1.tag)*/
+					
 					if (parent.children[i].stringConcat == true) { // concatenation
 						oper1 = traverse(parent.children[++i], false, def);
 						oper2 = traverse(parent.children[++i], false, def);
 						if (willPrint == true) {
-							System.out.print("s\" " + oper1.tok.lexeme
-									+ "\" s\" " + oper2.tok.lexeme + "\" s+ ");
+							oper1 = traverse(parent.children[i -1], true, def);
+							oper2 = traverse(parent.children[i], true, def);
+							/*System.out.print("s\" " + oper1.tok.lexeme
+									+ "\" s\" " + oper2.tok.lexeme + "\" s+ ");*/
+							System.out.print("s+ ");
 						}
 						return new Node(Tag.STRING, null);
 					}
@@ -291,11 +299,12 @@ public class Node {
 					case Tag.STRING:
 						// System.out.print(".\" " + oper1.lexeme + "\" ");
 						// System.out.print("s\" " + oper1.lexeme + "\" type ");
-						if (oper1.lexeme == null) {
+						traverse(parent.children[i], true, def);
+						/*if (oper1.lexeme == null) {
 							traverse(parent.children[i], true, def);
 						} else {
 							System.out.print("s\" " + oper1.lexeme + "\" ");
-						}
+						}*/
 						System.out.print("type ");
 						break;
 					case Tag.REAL:
@@ -316,11 +325,29 @@ public class Node {
 						System.out.print(". ");
 						break;
 					}
-				} else if (child.tok.isName()) {
-					if (willPrint == true) {
-						System.out.print(child.lexeme);
+				} else if (child.tok.isName()) { // only reached when using dereferencing a variable
+					String type = variables.get(child.tok.lexeme);
+					int tag = 0;
+					if (type.equals("int")) {
+						tag = Tag.NUM;
+					} else if (type.equals("float")) {
+						tag = Tag.REAL;
+					} else if (type.equals("string")) {
+						tag = Tag.STRING;
+					} else if (type.equals("bool")) {
+						// Does it matter what we tag this as?
+						tag = Tag.TRUE; // chosen arbitrarily
 					}
-					return child;
+					if (willPrint == true) {
+						System.out.print(child.lexeme + " ");
+						if (tag == Tag.STRING){
+							System.out.print("2");
+						} else if (tag == Tag.REAL) {
+							System.out.print("f");
+						}
+						System.out.print("@ ");
+					}
+					return new Node(tag, child.tok.lexeme);
 				} else if (child.tok.isConstant()) {
 					if (willPrint == true) {
 						if (child.tok.tag == Tag.STRING) {
