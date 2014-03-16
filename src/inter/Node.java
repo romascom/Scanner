@@ -1,13 +1,17 @@
 package inter;
 
+import java.util.*;
 import lexer.*;
 
 public class Node {
+	private static HashMap<String, String> variables = new HashMap<String, String>();
+
 	private Node[] children = new Node[6];
 	private int tag = 0;
 	private String lexeme = null;
 	private Token tok;
 	private int i = 0;
+	private String type; // the variable type associated with this node
 	// private boolean isNestedComp = false; // True if node is nested within a
 	// node that has Gforth compilation semantics
 	private boolean stringConcat = false;
@@ -85,6 +89,24 @@ public class Node {
 	public void addChild(Node child) {
 		children[i] = child;
 		i++;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String t) {
+		this.type = t; // should be “float” “int” “string” or “bool”
+	}
+	
+	public static void traverseVarlist(Node parent) {
+		String name = parent.children[1].children[0].lexeme;
+		String type = parent.children[2].children[0].lexeme;
+		System.out.print("create " + name + " ");
+		variables.put(name, type);
+		if (parent.children[4] != null) {
+		traverseVarlist(parent.children[4]);
+		}
 	}
 
 	/**
@@ -218,6 +240,29 @@ public class Node {
 					if (inDef == false) {
 						System.out.print("; def "); // call new word
 					}
+				} else if (child.tag == Tag.LET) {
+					i = i + 2;
+					traverseVarlist(parent.children[i]);
+				} else if (child.tok.tag == Tag.ID) {
+					System.out.print("create " + child.tok.lexeme + " ");
+					variables.put(child.tok.lexeme, "");
+					System.err.println(i);
+					//System.err.println(parent.children[2].lexeme);
+					traverse(parent.children[++i], true, def);
+					i++; // skip RSB
+					if (parent.children[++i] != null) {
+						traverse(parent.children[i], false, def);
+					}
+					//return child;
+				} else if (child.tok.tag == Tag.BASIC) {
+					if (child.lexeme.equals("int")
+							|| child.lexeme.equals("float")
+							|| child.lexeme.equals("bool")
+							|| child.lexeme.equals("string")) {
+						variables.put(parent.children[i - 1].tok.lexeme,
+								child.lexeme);
+					}
+					//return child;
 				} else if (child.tok.tag == Tag.STDOUT) {
 					oper1 = traverse(parent.children[++i], false, def);
 					switch (oper1.tag) {
@@ -263,7 +308,13 @@ public class Node {
 					System.out.print(" ");
 					return child;
 				}
-			} else {
+			} /*else if (child.children[0].tok.tag != 0) {
+				if (child.children[0].tok.tag == Tag.ID || child.children[0].tok.tag == Tag.BASIC) {
+					
+				} else {
+					return traverse(child, willPrint, def);
+				}
+			}*/ else {
 				// System.err.println("  This child is a nonterminal");// debug
 				return traverse(child, willPrint, def);
 			}
