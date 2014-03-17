@@ -303,6 +303,21 @@ public class Node {
 					if (inDef == false) {
 						System.out.print("; def "); // call new word
 					}
+				} else if (child.tok.tag == Tag.WHILE) {
+					if (def == false) {
+						System.out.print(": def "); // define new word
+						def = true;
+					}
+					
+					System.out.print("BEGIN ");
+					traverse(parent.children[++i], true, def);
+					System.out.print("WHILE ");
+					traverse(parent.children[++i], true, def);
+					System.out.print("REPEAT ");
+					
+					if (inDef == false) {
+						System.out.print("; def "); // call new word
+					}
 				} else if (child.tag == Tag.LET) {
 					i = i + 2;
 					traverseVarlist(parent.children[i], willPrint);
