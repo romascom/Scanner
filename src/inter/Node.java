@@ -25,10 +25,13 @@ public class Node {
 	public Node(int tag, String lexeme) {
 		this.tag = tag;
 		this.lexeme = lexeme;
+		this.tok = new Token(lexeme, tag);
 	}
 
 	public Node(Token tok) {
 		this.tok = tok;
+		this.tag = tok.tag;
+		this.lexeme = tok.lexeme;
 	}
 
 	/**
@@ -189,19 +192,30 @@ public class Node {
 				} else if (child.tok.isBinop()) {
 					// System.out.println("  This child is a binary operator");//
 					// debug
-					
-					/*oper1 = traverse(parent.children[++i], false, def);
+
+					// conversions for variables
+					oper1 = traverse(parent.children[++i], false, def);
 					oper2 = traverse(parent.children[++i], false, def);
-					if (oper1.tag)*/
-					
+					i = i - 2;
+					if (child.tok.tag == Tag.PLUS
+							&& oper1.tok.tag == Tag.STRING
+							&& oper2.tok.tag == Tag.STRING) {
+						child.stringConcat = true;
+					} else if (oper1.tok.tag == Tag.NUM
+							&& oper2.tok.tag == Tag.REAL) {
+						parent.children[i+1].floatConversion = true;
+					}
+
 					if (parent.children[i].stringConcat == true) { // concatenation
 						oper1 = traverse(parent.children[++i], false, def);
 						oper2 = traverse(parent.children[++i], false, def);
 						if (willPrint == true) {
-							oper1 = traverse(parent.children[i -1], true, def);
+							oper1 = traverse(parent.children[i - 1], true, def);
 							oper2 = traverse(parent.children[i], true, def);
-							/*System.out.print("s\" " + oper1.tok.lexeme
-									+ "\" s\" " + oper2.tok.lexeme + "\" s+ ");*/
+							/*
+							 * System.out.print("s\" " + oper1.tok.lexeme +
+							 * "\" s\" " + oper2.tok.lexeme + "\" s+ ");
+							 */
 							System.out.print("s+ ");
 						}
 						return new Node(Tag.STRING, null);
@@ -300,11 +314,11 @@ public class Node {
 						// System.out.print(".\" " + oper1.lexeme + "\" ");
 						// System.out.print("s\" " + oper1.lexeme + "\" type ");
 						traverse(parent.children[i], true, def);
-						/*if (oper1.lexeme == null) {
-							traverse(parent.children[i], true, def);
-						} else {
-							System.out.print("s\" " + oper1.lexeme + "\" ");
-						}*/
+						/*
+						 * if (oper1.lexeme == null) {
+						 * traverse(parent.children[i], true, def); } else {
+						 * System.out.print("s\" " + oper1.lexeme + "\" "); }
+						 */
 						System.out.print("type ");
 						break;
 					case Tag.REAL:
@@ -325,7 +339,8 @@ public class Node {
 						System.out.print(". ");
 						break;
 					}
-				} else if (child.tok.isName()) { // only reached when using dereferencing a variable
+				} else if (child.tok.isName()) { // only reached when using
+													// dereferencing a variable
 					String type = variables.get(child.tok.lexeme);
 					int tag = 0;
 					if (type.equals("int")) {
@@ -340,7 +355,7 @@ public class Node {
 					}
 					if (willPrint == true) {
 						System.out.print(child.lexeme + " ");
-						if (tag == Tag.STRING){
+						if (tag == Tag.STRING) {
 							System.out.print("2");
 						} else if (tag == Tag.REAL) {
 							System.out.print("f");
@@ -358,13 +373,13 @@ public class Node {
 						// System.err.println("Child is constant");// debug
 
 						System.out.print(child.lexeme);
-					}
+					
 					if (child.tok.tag == Tag.REAL
 							&& !child.tok.lexeme.contains("e")) {
 						System.out.print("e");
 					}
 
-					System.out.print(" ");
+					System.out.print(" ");}
 					return child;
 				}
 			} /*
